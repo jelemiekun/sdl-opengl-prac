@@ -4,6 +4,7 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
+#include "Texture.h"
 
 Game::Game() {}
 
@@ -91,11 +92,11 @@ Game::Game() {}
     shader = std::make_unique<Shader>("source.shader");
 
     std::vector<GLfloat> vertices = {
-        // Coordinates      Colors
-        -0.2f,  0.2f, 0.0f, 1.0f, 0.0f, 0.0f,
-         0.2f,  0.2f, 0.0f, 0.0f, 1.0f, 0.0f,
-        -0.2f, -0.2f, 0.0f, 0.0f, 0.0f, 1.0f,
-         0.2f, -0.2f, 0.0f, 0.5f, 0.5f, 0.5f,
+        // Coordinates      Colors           
+        -0.6f,  0.6f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+         0.6f,  0.6f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+        -0.6f, -0.6f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+         0.6f, -0.6f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f
     };
 
     std::vector<GLuint> indices = {
@@ -103,18 +104,20 @@ Game::Game() {}
         1, 2, 3
     };
 
+    texture = std::make_unique<Texture>("assets/pic.jpg");
+
     indicesCount = indices.size();
 
     vertexArray = std::make_unique<VertexArray>();
     vertexBuffer = std::make_unique<VertexBuffer>(vertices.data(), vertices.size() * sizeof(GLfloat));
 
-    vertexArray->AddBuffer(*vertexBuffer, { 3, 3 });
+    vertexArray->AddBuffer(*vertexBuffer, { 3, 3, 2 });
 
     elementBuffer = std::make_unique<ElementBuffer>(indices.data(), indicesCount);
 }
 
  void Game::update() {
-
+     texture->bind();
 }
 
  void Game::render() {

@@ -7,6 +7,7 @@ class Shader;
 class VertexArray;
 class VertexBuffer;
 class ElementBuffer;
+class Texture;
 
 class Game {
 private:
@@ -21,6 +22,7 @@ private:
     std::unique_ptr<VertexArray> vertexArray;
     std::unique_ptr<VertexBuffer> vertexBuffer;
     std::unique_ptr<ElementBuffer> elementBuffer;
+    std::unique_ptr<Texture> texture;
     GLuint indicesCount;
 
 public:
