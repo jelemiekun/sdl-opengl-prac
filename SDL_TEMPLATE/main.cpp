@@ -1,14 +1,19 @@
 #include <SDL.h>
 #include <glad/glad.h>
 #include <spdlog/spdlog.h>
+#include "Shader.h"
+#include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "ElementBuffer.h"
+#include <memory>
 
 static SDL_GLContext glContext;
 static SDL_Window* window;
 static bool running = false;
-static GLuint VAO;
-static GLuint VBO;
-static GLuint EBO;
-static GLuint shaderProgram;
+static std::unique_ptr<Shader> shader;
+static std::unique_ptr<VertexArray> vertexArray;
+static std::unique_ptr<VertexBuffer> vertexBuffer;
+static std::unique_ptr<ElementBuffer> elementBuffer;
 static GLuint indicesCount;
 
 static bool initSDL() {
@@ -84,105 +89,34 @@ static void processInput() {
 }
 
 static void tutorial() {
-    const char* vertexShaderSource = "#version 430 core\n"
-        "layout (location = 0) in vec3 aPos;\n"  // Input position attribute
-        "void main()\n"
-        "{\n"
-        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"  // Set the vertex position in clip space
-        "}\0";
-
-    // Define the fragment shader source code
-    const char* fragmentShaderSource = "#version 430 core\n"
-        "out vec4 FragColor;\n"  // Output color variable
-        "void main()\n"
-        "{\n"
-        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"  // Set fragment color
-        "}\n\0";
 
     glViewport(0, 0, 640, 480);
     glEnable(GL_DEPTH_TEST);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-
-    // Check for vertex shader compilation errors
-    GLint vertexSuccess;
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vertexSuccess);
-    if (vertexSuccess) {
-        spdlog::info("Vertex shader successfully compiled.");
-    }
-    else {
-        char log[512];
-        glGetShaderInfoLog(vertexShader, 512, NULL, log);
-        spdlog::warn("Vertex shader failed to compile: {}", log);
-    }
-
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    GLint fragmentSuccess;
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fragmentSuccess);
-    if (fragmentSuccess) {
-        spdlog::info("Fragment shader successfully compiled.");
-    }
-    else {
-        char log[512];
-        glGetShaderInfoLog(fragmentShader, 512, NULL, log);
-        spdlog::warn("Fragment shader failed to compile: {}", log);
-    }
-
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    glValidateProgram(shaderProgram);
-
-    GLint linkingSuccess;
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &linkingSuccess);
-    if (linkingSuccess) {
-        spdlog::info("Shader program linked successfully.");
-    }
-    else {
-        char log[512];
-        glGetProgramInfoLog(shaderProgram, 512, NULL, log);
-        spdlog::warn("Shader program failed to link: {}", log);
-    }
-
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    shader = std::make_unique<Shader>("source.shader");
 
     std::vector<GLfloat> vertices = {
-        -0.2f, 0.2f, 0.0f,
-        0.2f, 0.2f, 0.0f,
-        -0.2f, -0.2f, 0.0f,
-        0.2f, -0.2f, 0.0f
+        // Coordinates      Colors
+        -0.2f,  0.2f, 0.0f, 1.0f, 0.0f, 0.0f,
+         0.2f,  0.2f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.2f, -0.2f, 0.0f, 0.0f, 0.0f, 1.0f,
+         0.2f, -0.2f, 0.0f, 0.5f, 0.5f, 0.5f,
     };
 
-    std::vector<GLint> indices = {
+    std::vector<GLuint> indices = {
         0, 1, 2,
         1, 2, 3
     };
-
+    
     indicesCount = indices.size();
 
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
+    vertexArray = std::make_unique<VertexArray>();
+    vertexBuffer = std::make_unique<VertexBuffer>(vertices.data(), vertices.size() * sizeof(GLfloat));
 
-    glGenBuffers(1, &VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
+    vertexArray->AddBuffer(*vertexBuffer, { 3, 3 });
 
-    glGenBuffers(1, &EBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLint), indices.data(), GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glBindVertexArray(0);
+    elementBuffer = std::make_unique<ElementBuffer>(indices.data(), indicesCount);
 }
 
 static void update() {
@@ -191,12 +125,13 @@ static void update() {
 
 static void render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glUseProgram(shaderProgram);
+    shader->use();
+    vertexArray->Bind();
+    elementBuffer->Bind();
     glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
+    vertexArray->Unbind();
 
     SDL_GL_SwapWindow(window);
 }
@@ -218,10 +153,6 @@ int SDL_main(int argc, char* argv[]) {
         }
 
         {
-            glDeleteVertexArrays(1, &VAO);
-            glDeleteBuffers(1, &VBO);
-            glDeleteBuffers(1, &EBO);
-            glDeleteProgram(shaderProgram);
 
             SDL_DestroyWindow(window);
             SDL_Quit();
