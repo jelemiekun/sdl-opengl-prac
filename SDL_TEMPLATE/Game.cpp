@@ -6,6 +6,8 @@
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
 #include "Texture.h"
+#include <imgui_impl_sdl2.h>
+#include "ImGUIWindow.h"
 
 Game::Game() {}
 
@@ -47,6 +49,11 @@ Game::Game() {}
         return true;
     }
 }
+
+ void Game::initImGUI() {
+     imGUIWindow = ImGUIWindow::getInstance();
+     imGUIWindow->init(window, &glContext);
+ }
 
  void Game::initHandleEvent() {
      spdlog::info("Initializing event handler...");
@@ -141,6 +148,8 @@ Game::Game() {}
     glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
     vertexArray->Unbind();
 
+    imGUIWindow->render();
+
     SDL_GL_SwapWindow(window);
 }
 
@@ -148,6 +157,7 @@ void Game::initialize() {
     spdlog::info("Initializing program...");
 
     if (initEverything()) {
+        initImGUI();
         initHandleEvent();
 
         spdlog::info("Program initialized.");

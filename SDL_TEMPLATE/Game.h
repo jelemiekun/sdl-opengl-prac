@@ -9,6 +9,7 @@ class VertexBuffer;
 class ElementBuffer;
 class Texture;
 class HandleEvent;
+class ImGUIWindow;
 
 class Game {
 private:
@@ -21,6 +22,8 @@ private:
     bool running = false;
     SDL_Event event;
     HandleEvent* handleEvent = nullptr;
+    ImGUIWindow* imGUIWindow;
+
     std::unique_ptr<Shader> shader;
     std::unique_ptr<Texture> texture;
     std::unique_ptr<VertexArray> vertexArray;
@@ -41,6 +44,7 @@ public:
 
     bool initSDL();
     bool initGLAD();
+    void initImGUI();
     void setOpenGLAttributes();
     bool initOpenGL();
     void initHandleEvent();
