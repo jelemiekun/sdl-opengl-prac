@@ -2373,7 +2373,7 @@ static void ShowDemoWindowWidgets(ImGuiDemoWindowData* demo_data)
         ImGui::CheckboxFlags("ImGuiSliderFlags_WrapAround", &flags, ImGuiSliderFlags_WrapAround);
         ImGui::SameLine(); HelpMarker("Enable wrapping around from max to min and from min to max (only supported by DragXXX() functions)");
 
-        // Drags
+        // Dragsc
         static float drag_f = 0.5f;
         static int drag_i = 50;
         ImGui::Text("Underlying float value: %f", drag_f);

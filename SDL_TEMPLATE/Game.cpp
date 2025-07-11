@@ -8,6 +8,7 @@
 #include "Texture.h"
 #include <imgui_impl_sdl2.h>
 #include "ImGUIWindow.h"
+#include "ProgramValues.h"
 
 Game::Game() {}
 
@@ -21,7 +22,13 @@ Game::Game() {}
     else {
         spdlog::info("Initializing sdl window...");
 
-        window = SDL_CreateWindow("SDL OPEN_GL PRACTICE", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 640, 480, SDL_WINDOW_OPENGL);
+        window = SDL_CreateWindow(
+            "SDL OPEN_GL PRACTICE", 
+            SDL_WINDOWPOS_CENTERED, 
+            SDL_WINDOWPOS_CENTERED, 
+            ProgramValues::ProgramDimensionX, 
+            ProgramValues::ProgramDimensionY, 
+            SDL_WINDOW_OPENGL);
 
         if (!window) {
             spdlog::error("Window creation failed: {}", SDL_GetError());
@@ -96,8 +103,10 @@ Game::Game() {}
 
  void Game::tutorial() {
 
-    glViewport(0, 0, 640, 480);
+    glViewport(0, 0, ProgramValues::ProgramDimensionX, ProgramValues::ProgramDimensionY);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     shader = std::make_unique<Shader>("source.shader");
@@ -105,10 +114,10 @@ Game::Game() {}
     { // Colors
         std::vector<GLfloat> vertices = {
             // Coords               Picture Coords      Colors
-             -0.6f, 0.6f, 0.0f,     0.0f, 1.0f,         1.0f,  0.0f, 0.0f,
-              0.6f, 0.6f, 0.0f,     0.0f, 0.0f,         0.0f,  1.0f, 0.0f,
-             -0.6f,-0.6f, 0.0f,     1.0f, 1.0f,         0.0f,  0.0f, 1.0f,
-              0.6f,-0.6f, 0.0f,     1.0f, 0.0f,         0.6f,  0.6f, 0.6f
+             -0.9f, 0.6f, 0.0f,     0.0f, 1.0f,         
+              0.9f, 0.6f, 0.0f,     1.0f, 1.0f,  
+             -0.9f,-0.6f, 0.0f,     0.0f, 0.0f,       
+              0.9f,-0.6f, 0.0f,     1.0f, 0.0f
         };
 
         std::vector<GLuint> indices = {
@@ -121,7 +130,7 @@ Game::Game() {}
         vertexArray = std::make_unique<VertexArray>();
         vertexBuffer = std::make_unique<VertexBuffer>(vertices.data(), vertices.size() * sizeof(GLfloat));
 
-        vertexArray->AddBuffer(*vertexBuffer, { 3 , 2 , 3 });
+        vertexArray->AddBuffer(*vertexBuffer, { 3 , 2 });
 
         elementBuffer = std::make_unique<ElementBuffer>(indices.data(), indicesCount);
     }
@@ -131,10 +140,27 @@ Game::Game() {}
 
     texture = std::make_unique<Texture>("assets/pic.jpg");
     glUniform1i(glGetUniformLocation(shader->ID, "texture1"), 0);
-    glUniform3f(glGetUniformLocation(shader->ID, "u_ModifiedCoords"), 1.0f, 1.0f, 1.0f);
+    glUniform3f(glGetUniformLocation(shader->ID, "u_ModifiedCoords"), ProgramValues::x, ProgramValues::x, 0.8f);
 }
 
  void Game::update() {
+     {
+         glUniform3f(glGetUniformLocation(shader->ID, "u_ModifiedCoords"), ProgramValues::x, ProgramValues::y, 0.0f);
+
+         glUniform4f(
+             glGetUniformLocation(shader->ID, "u_Color"),
+             ProgramValues::v1_color.r,
+             ProgramValues::v1_color.g,
+             ProgramValues::v1_color.b,
+             ProgramValues::v1_color.a
+         );
+
+         glUniform1f(
+             glGetUniformLocation(shader->ID, "u_DimensionScalar"),
+             ProgramValues::dimensionScalar
+         );
+     }
+
      texture->bind();
 }
 
@@ -173,6 +199,7 @@ void Game::reset() {
     vertexBuffer.reset();
     elementBuffer.reset();
     shader.reset();
+    imGUIWindow->clean();
     SDL_DestroyWindow(window);
     SDL_Quit();
 }
