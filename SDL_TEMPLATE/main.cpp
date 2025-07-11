@@ -5,8 +5,8 @@
 static SDL_GLContext glContext;
 static SDL_Window* window;
 static bool running = false;
-static GLuint VBO;
 static GLuint VAO;
+static GLuint VBO;
 static GLuint EBO;
 static GLuint shaderProgram;
 static GLuint indicesCount;
@@ -84,7 +84,6 @@ static void processInput() {
 }
 
 static void tutorial() {
-    // Define the vertex shader source code
     const char* vertexShaderSource = "#version 430 core\n"
         "layout (location = 0) in vec3 aPos;\n"  // Input position attribute
         "void main()\n"
@@ -108,14 +107,16 @@ static void tutorial() {
     glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
     glCompileShader(vertexShader);
 
+    // Check for vertex shader compilation errors
     GLint vertexSuccess;
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vertexSuccess);
     if (vertexSuccess) {
         spdlog::info("Vertex shader successfully compiled.");
-    } else {
+    }
+    else {
         char log[512];
         glGetShaderInfoLog(vertexShader, 512, NULL, log);
-        spdlog::error("Vertex shader failed to compile: {}", log);
+        spdlog::warn("Vertex shader failed to compile: {}", log);
     }
 
     GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -130,14 +131,13 @@ static void tutorial() {
     else {
         char log[512];
         glGetShaderInfoLog(fragmentShader, 512, NULL, log);
-        spdlog::error("Fragment shader failed to compile: {}", log);
+        spdlog::warn("Fragment shader failed to compile: {}", log);
     }
 
     shaderProgram = glCreateProgram();
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
-    
     glValidateProgram(shaderProgram);
 
     GLint linkingSuccess;
@@ -155,13 +155,15 @@ static void tutorial() {
     glDeleteShader(fragmentShader);
 
     std::vector<GLfloat> vertices = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f
+        -0.2f, 0.2f, 0.0f,
+        0.2f, 0.2f, 0.0f,
+        -0.2f, -0.2f, 0.0f,
+        0.2f, -0.2f, 0.0f
     };
 
-    std::vector<GLuint> indices = {
-        0, 1, 2
+    std::vector<GLint> indices = {
+        0, 1, 2,
+        1, 2, 3
     };
 
     indicesCount = indices.size();
@@ -171,19 +173,16 @@ static void tutorial() {
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), vertices.data(), GL_STATIC_DRAW);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * indices.size(), indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLint), indices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 3, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
     glEnableVertexAttribArray(0);
 
     glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glUseProgram(0);
 }
 
 static void update() {
@@ -195,7 +194,7 @@ static void render() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glBindVertexArray(VAO);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glUseProgram(shaderProgram);
     glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
 
