@@ -22,6 +22,7 @@
     <ClCompile Include="..\..\..\..\..\..\glad\src\glad.c" />
     <ClCompile Include="ElementBuffer.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="HandleEvent.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb.cpp" />
@@ -37,6 +38,7 @@
   <ItemGroup>
     <ClInclude Include="ElementBuffer.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="HandleEvent.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb.h" />
     <ClInclude Include="Texture.h" />

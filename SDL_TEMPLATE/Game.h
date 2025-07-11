@@ -8,6 +8,7 @@ class VertexArray;
 class VertexBuffer;
 class ElementBuffer;
 class Texture;
+class HandleEvent;
 
 class Game {
 private:
@@ -18,11 +19,14 @@ private:
     SDL_GLContext glContext;
     SDL_Window* window;
     bool running = false;
+    SDL_Event event;
+    HandleEvent* handleEvent = nullptr;
     std::unique_ptr<Shader> shader;
+    std::unique_ptr<Texture> texture;
     std::unique_ptr<VertexArray> vertexArray;
+
     std::unique_ptr<VertexBuffer> vertexBuffer;
     std::unique_ptr<ElementBuffer> elementBuffer;
-    std::unique_ptr<Texture> texture;
     GLuint indicesCount;
 
 public:
@@ -39,10 +43,12 @@ public:
     bool initGLAD();
     void setOpenGLAttributes();
     bool initOpenGL();
+    void initHandleEvent();
     bool initEverything();
     void initialize();
 
     bool isRunning();
+    void setRunning(bool running);
 
     void processInput();
     void update();

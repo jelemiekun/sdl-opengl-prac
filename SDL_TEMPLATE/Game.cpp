@@ -1,5 +1,6 @@
 #include "Game.h"
 #include <spdlog/spdlog.h>
+#include "HandleEvent.h"
 #include "Shader.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
@@ -47,6 +48,12 @@ Game::Game() {}
     }
 }
 
+ void Game::initHandleEvent() {
+     spdlog::info("Initializing event handler...");
+     handleEvent = HandleEvent::getInstance();
+     spdlog::info("Event handler initialized successfully.");
+ }
+
  void Game::setOpenGLAttributes() {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
@@ -77,10 +84,7 @@ Game::Game() {}
 }
 
  void Game::processInput() {
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-        if (event.type == SDL_QUIT) running = false;
-    }
+     handleEvent->input(event);
 }
 
  void Game::tutorial() {
@@ -91,29 +95,36 @@ Game::Game() {}
 
     shader = std::make_unique<Shader>("source.shader");
 
-    std::vector<GLfloat> vertices = {
-        // Coordinates      Colors           
-        -0.6f,  0.6f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-         0.6f,  0.6f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-        -0.6f, -0.6f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-         0.6f, -0.6f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f
-    };
+    { // Colors
+        std::vector<GLfloat> vertices = {
+            // Coords               Picture Coords      Colors
+             -0.6f, 0.6f, 0.0f,     0.0f, 1.0f,         1.0f,  0.0f, 0.0f,
+              0.6f, 0.6f, 0.0f,     0.0f, 0.0f,         0.0f,  1.0f, 0.0f,
+             -0.6f,-0.6f, 0.0f,     1.0f, 1.0f,         0.0f,  0.0f, 1.0f,
+              0.6f,-0.6f, 0.0f,     1.0f, 0.0f,         0.6f,  0.6f, 0.6f
+        };
 
-    std::vector<GLuint> indices = {
-        0, 1, 2,
-        1, 2, 3
-    };
+        std::vector<GLuint> indices = {
+            0, 1, 2,
+            1, 2, 3
+        };
+
+        indicesCount = indices.size();
+
+        vertexArray = std::make_unique<VertexArray>();
+        vertexBuffer = std::make_unique<VertexBuffer>(vertices.data(), vertices.size() * sizeof(GLfloat));
+
+        vertexArray->AddBuffer(*vertexBuffer, { 3 , 2 , 3 });
+
+        elementBuffer = std::make_unique<ElementBuffer>(indices.data(), indicesCount);
+    }
+
+
+    shader->use();
 
     texture = std::make_unique<Texture>("assets/pic.jpg");
-
-    indicesCount = indices.size();
-
-    vertexArray = std::make_unique<VertexArray>();
-    vertexBuffer = std::make_unique<VertexBuffer>(vertices.data(), vertices.size() * sizeof(GLfloat));
-
-    vertexArray->AddBuffer(*vertexBuffer, { 3, 3, 2 });
-
-    elementBuffer = std::make_unique<ElementBuffer>(indices.data(), indicesCount);
+    glUniform1i(glGetUniformLocation(shader->ID, "texture1"), 0);
+    glUniform3f(glGetUniformLocation(shader->ID, "u_ModifiedCoords"), 1.0f, 1.0f, 1.0f);
 }
 
  void Game::update() {
@@ -137,6 +148,8 @@ void Game::initialize() {
     spdlog::info("Initializing program...");
 
     if (initEverything()) {
+        initHandleEvent();
+
         spdlog::info("Program initialized.");
         running = true;
     }
@@ -156,6 +169,10 @@ void Game::reset() {
 
 bool Game::isRunning() {
     return running;
+}
+
+void Game::setRunning(bool running) {
+    this->running = running;
 }
 
 Game* Game::getInstance() {
