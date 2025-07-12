@@ -9,6 +9,8 @@
 #include <imgui_impl_sdl2.h>
 #include "ImGUIWindow.h"
 #include "ProgramValues.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 Game::Game() {}
 
@@ -114,10 +116,10 @@ Game::Game() {}
     { // Colors
         std::vector<GLfloat> vertices = {
             // Coords               Picture Coords      Colors
-             -0.9f, 0.6f, 0.0f,     0.0f, 1.0f,         
-              0.9f, 0.6f, 0.0f,     1.0f, 1.0f,  
-             -0.9f,-0.6f, 0.0f,     0.0f, 0.0f,       
-              0.9f,-0.6f, 0.0f,     1.0f, 0.0f
+             -1920.0f, 1080.0f, 0.0f,     0.0f, 1.0f,         
+              1920.0f, 1080.0f, 0.0f,     1.0f, 1.0f,  
+             -1920.0f,-1080.0f, 0.0f,     0.0f, 0.0f,       
+              1920.0f,-1080.0f, 0.0f,     1.0f, 0.0f
         };
 
         std::vector<GLuint> indices = {
@@ -135,12 +137,14 @@ Game::Game() {}
         elementBuffer = std::make_unique<ElementBuffer>(indices.data(), indicesCount);
     }
 
+    glm::mat4 proj = glm::ortho(-1920.0f, 1920.0f, -1080.0f, 1080.0f, -1.0f, 1.0f);
 
     shader->use();
 
     texture = std::make_unique<Texture>("assets/pic.jpg");
     glUniform1i(glGetUniformLocation(shader->ID, "texture1"), 0);
     glUniform3f(glGetUniformLocation(shader->ID, "u_ModifiedCoords"), ProgramValues::x, ProgramValues::x, 0.8f);
+    glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_MVP"), 1, GL_FALSE, &proj[0][0]);
 }
 
  void Game::update() {

@@ -13,7 +13,6 @@ class ImGUIWindow;
 
 class Game {
 private:
-    // Private constructor to prevent outside instantiation
     Game();
 
 private:
@@ -33,13 +32,11 @@ private:
     GLuint indicesCount;
 
 public:
-    // Deleted copy constructor and assignment operator to prevent copying
     Game(const Game&) = delete;
     Game& operator=(const Game&) = delete;
     Game(Game&&) = delete;
     Game& operator=(Game&&) = delete;
 
-    // Static method to get the instance
     static Game* getInstance();
 
     bool initSDL();
