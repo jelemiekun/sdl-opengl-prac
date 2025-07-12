@@ -116,10 +116,10 @@ Game::Game() {}
     { // Colors
         std::vector<GLfloat> vertices = {
             // Coords               Picture Coords      Colors
-             -1.6f, 0.9f, 0.0f,     0.0f, 1.0f,         
-              1.6f, 0.9f, 0.0f,     1.0f, 1.0f,  
-             -1.6f,-0.9f, 0.0f,     0.0f, 0.0f,       
-              1.6f,-0.9f, 0.0f,     1.0f, 0.0f
+             -0.2f, 0.11f, 0.0f,     0.0f, 1.0f,         
+              0.2f, 0.11f, 0.0f,     1.0f, 1.0f,  
+             -0.2f,-0.11f, 0.0f,     0.0f, 0.0f,       
+              0.2f,-0.11f, 0.0f,     1.0f, 0.0f
         };
 
         std::vector<GLuint> indices = {
@@ -178,15 +178,6 @@ Game::Game() {}
          );
      }
 
-     {
-         float timeValue = SDL_GetTicks() / 1000.0f;
-
-         glm::mat4 model = glm::mat4(1.0f);
-         model = glm::rotate(model, timeValue * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
-         glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Model"), 1, GL_FALSE, &model[0][0]);
-     }
-
      texture->bind();
 }
 
@@ -197,9 +188,23 @@ Game::Game() {}
     shader->use();
     vertexArray->Bind();
     elementBuffer->Bind();
-    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
-    vertexArray->Unbind();
 
+    float time = SDL_GetTicks() / 1000.0f;
+
+    for (unsigned int i = 0; i < 10; i++) {
+        glm::mat4 model = glm::mat4(1.0f);
+        float static_angle = 20.0f * i;
+        float dynamic_angle = time * glm::radians(50.0f);
+
+        model = glm::translate(model, ObjectPositions::positions[i]);
+        model = glm::rotate(model, dynamic_angle + glm::radians(static_angle), ObjectPositions::positions[i]);
+
+        glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Model"), 1, GL_FALSE, &model[0][0]);
+
+        glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
+    }
+
+    vertexArray->Unbind();
     imGUIWindow->render();
 
     SDL_GL_SwapWindow(window);

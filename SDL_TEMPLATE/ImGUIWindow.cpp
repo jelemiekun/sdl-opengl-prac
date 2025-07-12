@@ -84,7 +84,7 @@ void ImGUIWindow::render() {
 
 			ImGui::SeparatorText("Scalar:");
 			ImGui::Text("Scalar value: %.3f", ProgramValues::dimensionScalar);
-			ImGui::SliderFloat("Scalar Value:", &ProgramValues::dimensionScalar, 0.0f, 10.0f, "%.3f");
+			ImGui::SliderFloat("Scalar Value:", &ProgramValues::dimensionScalar, 0.0f, 100.0f, "%.3f");
 		}
 
 
