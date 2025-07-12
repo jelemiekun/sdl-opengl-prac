@@ -93,11 +93,11 @@ void ImGUIWindow::render() {
 			const ImGuiSliderFlags flags_for_sliders1 = flags1 & ~ImGuiSliderFlags_WrapAround;
 
 			ImGui::SeparatorText("Position:");
-			ImGui::Text("X value: %.3f", ProgramValues::x);
-			ImGui::SliderFloat("Slider X", &ProgramValues::x, -1.0f, 1.0f, "%.3f", flags_for_sliders1);
+			ImGui::Text("X value: %.4f", ProgramValues::x);
+			ImGui::SliderFloat("Slider X", &ProgramValues::x, -1.0f, 1.0f, "%.4f", flags_for_sliders1);
 
-			ImGui::Text("Y value: %.3f", ProgramValues::y);
-			ImGui::SliderFloat("Slider Y", &ProgramValues::y, -1.0f, 1.0f, "%.3f", flags_for_sliders1);
+			ImGui::Text("Y value: %.4f", ProgramValues::y);
+			ImGui::SliderFloat("Slider Y", &ProgramValues::y, -1.0f, 1.0f, "%.4f", flags_for_sliders1);
 		}
 
 		ImGui::End();

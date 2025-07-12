@@ -8,14 +8,17 @@ uniform vec3 u_ModifiedCoords;
 uniform vec4 u_Color;
 uniform float u_DimensionScalar;
 
-uniform mat4 u_MVP;
+uniform mat4 u_Model;
+uniform mat4 u_View;
+uniform mat4 u_Projection;
 
 out vec4 verticesColor;
 out vec2 textCoord;
 
 void main() {
-    vec4 pos = vec4((aPos + (u_ModifiedCoords * 1.5)) * u_DimensionScalar, 1.0);
-    gl_Position = u_MVP * pos;
+    vec4 pos = vec4((aPos + (u_ModifiedCoords * 1000)) * u_DimensionScalar, 1.0);
+    pos = u_Projection * u_View * u_Model * pos;
+    gl_Position = pos;
     verticesColor = u_Color;
     textCoord = aTextCoord;
 }
