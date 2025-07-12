@@ -116,10 +116,10 @@ Game::Game() {}
     { // Colors
         std::vector<GLfloat> vertices = {
             // Coords               Picture Coords      Colors
-             -16.0f, 9.0f, 0.0f,     0.0f, 1.0f,         
-              16.0f, 9.0f, 0.0f,     1.0f, 1.0f,  
-             -16.0f,-9.0f, 0.0f,     0.0f, 0.0f,       
-              16.0f,-9.0f, 0.0f,     1.0f, 0.0f
+             -1.6f, 0.9f, 0.0f,     0.0f, 1.0f,         
+              1.6f, 0.9f, 0.0f,     1.0f, 1.0f,  
+             -1.6f,-0.9f, 0.0f,     0.0f, 0.0f,       
+              1.6f,-0.9f, 0.0f,     1.0f, 0.0f
         };
 
         std::vector<GLuint> indices = {
@@ -142,21 +142,22 @@ Game::Game() {}
     texture = std::make_unique<Texture>("assets/pic.jpg");
     glUniform1i(glGetUniformLocation(shader->ID, "texture1"), 0);
 
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+
+    glm::mat4 projection = glm::perspective(
+        glm::radians(45.0f),
         (float)ProgramValues::ProgramDimensionX / (float)ProgramValues::ProgramDimensionY,
         0.1f,
         1000.0f
-    );
+        );
 
     glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -90.0f));
+    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -1.0f));
+    view = glm::rotate(view, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f)); 
+    glm::mat4 model = glm::mat4(1.0);
 
     glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Projection"), 1, GL_FALSE, &projection[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_View"), 1, GL_FALSE, &view[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Model"), 1, GL_FALSE, &model[0][0]);
 }
 
  void Game::update() {
@@ -175,6 +176,15 @@ Game::Game() {}
              glGetUniformLocation(shader->ID, "u_DimensionScalar"),
              ProgramValues::dimensionScalar
          );
+     }
+
+     {
+         float timeValue = SDL_GetTicks() / 1000.0f;
+
+         glm::mat4 model = glm::mat4(1.0f);
+         model = glm::rotate(model, timeValue * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+
+         glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Model"), 1, GL_FALSE, &model[0][0]);
      }
 
      texture->bind();

@@ -17,7 +17,7 @@ out vec2 textCoord;
 
 void main() {
     vec4 pos = vec4((aPos + (u_ModifiedCoords * 1000)) * u_DimensionScalar, 1.0);
-    pos = u_Projection * u_View * u_Model * pos;
+    pos = u_Projection * u_View * u_Model  * pos;
     gl_Position = pos;
     verticesColor = u_Color;
     textCoord = aTextCoord;

@@ -11,7 +11,9 @@ HandleEvent* HandleEvent::getInstance() {
 }
 
 void HandleEvent::input(SDL_Event& event) {
-    static float movementValue = 0.005f;
+    static constexpr float movementValue = 0.0005f;
+    static constexpr float scalarValue = 0.05f;
+    static constexpr float cameraValue = 0.5f;
 
     while (SDL_PollEvent(&event)) {
         ImGui_ImplSDL2_ProcessEvent(&event);
@@ -20,33 +22,41 @@ void HandleEvent::input(SDL_Event& event) {
             Game::getInstance()->setRunning(false);
         } else if (event.type == SDL_KEYDOWN) {
             switch (event.key.keysym.sym) {
-            case SDLK_w: case SDLK_UP:
+            case SDLK_w: 
                 ProgramValues::y -= movementValue;
                 break;
-            case SDLK_s: case SDLK_DOWN:
+            case SDLK_s: 
                 ProgramValues::y += movementValue;
                 break;
-            case SDLK_a: case SDLK_LEFT :
+            case SDLK_a:
                 ProgramValues::x += movementValue;
                 break;
-            case SDLK_d: case SDLK_RIGHT:
+            case SDLK_d:
                 ProgramValues::x -= movementValue;
                 break;
             case SDLK_MINUS:
-                if (ProgramValues::dimensionScalar >= 0)
-                    ProgramValues::dimensionScalar -= movementValue;
+                if (ProgramValues::dimensionScalar >= scalarValue)
+                    ProgramValues::dimensionScalar -= scalarValue;
                 break;
             case SDLK_EQUALS:
-                ProgramValues::dimensionScalar += movementValue;
+                ProgramValues::dimensionScalar += scalarValue;
+                break;
+            case SDLK_UP:
+                break;
+            case SDLK_DOWN:
+                break;
+            case SDLK_LEFT:
+                break;
+            case SDLK_RIGHT:
                 break;
             default: break;
             }
         } else if (event.type == SDL_MOUSEWHEEL) {
             if (event.wheel.y > 0) {
-                    ProgramValues::dimensionScalar += movementValue;
+                    ProgramValues::dimensionScalar += scalarValue;
             } else if (event.wheel.y < 0) {
-                if (ProgramValues::dimensionScalar >= 0)
-                    ProgramValues::dimensionScalar -= movementValue;
+                if (ProgramValues::dimensionScalar >= scalarValue)
+                    ProgramValues::dimensionScalar -= scalarValue;
             }
         }
     }
