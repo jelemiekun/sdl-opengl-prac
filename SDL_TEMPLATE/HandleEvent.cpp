@@ -11,7 +11,7 @@ HandleEvent* HandleEvent::getInstance() {
 }
 
 void HandleEvent::input(SDL_Event& event) {
-    static constexpr float movementValue = 0.0005f;
+    static constexpr float movementValue = 0.0002f;
     static constexpr float scalarValue = 0.05f;
     static constexpr float cameraValue = 0.5f;
 
