@@ -184,13 +184,28 @@ Game::Game() {}
         1000.0f
         );
 
-    glm::mat4 view = glm::mat4(1.0f);
-    view = glm::translate(view, glm::vec3(0.0f, 0.0f, -1.0f));
-    view = glm::rotate(view, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
     glm::mat4 model = glm::mat4(1.0);
 
     glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Projection"), 1, GL_FALSE, &projection[0][0]);
+
+
+    glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 cameraRight = glm::vec3(glm::cross(up, cameraDirection));
+
+
+    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+
+    glm::mat4 view;
+    view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f));
+
     glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_View"), 1, GL_FALSE, &view[0][0]);
 }
 
@@ -251,6 +266,19 @@ Game::Game() {}
         model = glm::translate(model, glm::vec3(-0.05f, 0.05f, -0.2f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         draw(model);
+    }
+
+    {
+        float time = SDL_GetTicks() / 1000.0f;
+        float camX = sin(time);
+        float camZ = cos(time);
+        glm::mat4 view;
+        view = glm::lookAt(glm::vec3(camX, 0.0, camZ),
+            glm::vec3(0.0, 0.0, 0.0),
+            glm::vec3(0.0, 1.0, 0.0));
+
+        glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_View"), 1, GL_FALSE, &view[0][0]);
+
     }
 
     vertexArray->Unbind();
