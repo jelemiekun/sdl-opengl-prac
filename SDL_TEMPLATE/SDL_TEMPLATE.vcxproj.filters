@@ -72,6 +72,12 @@
     <ClCompile Include="stb.cpp">
       <Filter>Source Files\vendors</Filter>
     </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files\custom</Filter>
+    </ClCompile>
+    <ClCompile Include="GameWindow.cpp">
+      <Filter>Source Files\custom</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig">
@@ -79,9 +85,6 @@
     </None>
     <None Include="..\.gitignore">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="source.shader">
-      <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +120,12 @@
     </ClInclude>
     <ClInclude Include="stb.h">
       <Filter>Header Files\vendors\stb</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files\custom</Filter>
+    </ClInclude>
+    <ClInclude Include="GameWindow.h">
+      <Filter>Header Files\custom</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
