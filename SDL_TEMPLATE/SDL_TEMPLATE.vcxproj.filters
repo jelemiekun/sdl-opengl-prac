@@ -83,11 +83,11 @@
     <None Include=".editorconfig">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="source.shader">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="..\.gitignore">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="source.shader">
+      <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

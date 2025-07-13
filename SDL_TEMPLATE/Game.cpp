@@ -212,14 +212,7 @@ Game::Game() {}
          );
      }
 
-     {
-         float timeValue = SDL_GetTicks() / 1000.0f;
-
-         glm::mat4 model = glm::mat4(1.0f);
-         model = glm::rotate(model, timeValue * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-
-         glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Model"), 1, GL_FALSE, &model[0][0]);
-     }
+     
 
      texture->bind();
 }
@@ -231,7 +224,35 @@ Game::Game() {}
     shader->use();
     vertexArray->Bind();
     elementBuffer->Bind();
-    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
+
+    {
+        auto draw = [this](glm::mat4& model) -> void {
+            model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+            glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Model"), 1, GL_FALSE, &model[0][0]);
+            glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, 0);
+
+        };
+
+        glm::mat4 model = glm::mat4(1.0f);
+
+        model = glm::translate(model, glm::vec3(0.2f, 0.0f, 0.0f));
+        draw(model);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.8f, 0.2f, 0.0f));
+        draw(model);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-0.1f, 0.2f, 0.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        draw(model);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-0.05f, 0.05f, -0.2f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        draw(model);
+    }
+
     vertexArray->Unbind();
 
     imGUIWindow->render();
