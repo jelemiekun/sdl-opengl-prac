@@ -104,6 +104,7 @@ Game::Game() {}
 }
 
  void Game::tutorial() {
+     ProgramValues::windowFocused = true;
 
     glViewport(0, 0, ProgramValues::ProgramDimensionX, ProgramValues::ProgramDimensionY);
     glEnable(GL_DEPTH_TEST);
@@ -210,6 +211,19 @@ Game::Game() {}
 }
 
  void Game::update() {
+     SDL_SetRelativeMouseMode(ProgramValues::windowFocused ? SDL_TRUE : SDL_FALSE);
+
+     {
+         glm::mat4 projection = glm::perspective(
+             glm::radians(ProgramValues::Camera::fov),
+             (float)ProgramValues::ProgramDimensionX / (float)ProgramValues::ProgramDimensionY,
+             0.1f,
+             1000.0f
+         );
+
+         glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Projection"), 1, GL_FALSE, &projection[0][0]);
+     }
+
      {
          glUniform3f(glGetUniformLocation(shader->ID, "u_ModifiedCoords"), ProgramValues::x, ProgramValues::y, 0.0f);
 
@@ -227,7 +241,35 @@ Game::Game() {}
          );
      }
 
-     
+     {
+         if (ProgramValues::Movement::FRONT) {
+             ProgramValues::Camera::cameraPos += ProgramValues::Camera::cameraSpeed * ProgramValues::Camera::cameraFront;
+         }
+
+         if (ProgramValues::Movement::BACK) {
+             ProgramValues::Camera::cameraPos -= ProgramValues::Camera::cameraSpeed * ProgramValues::Camera::cameraFront;
+         }
+
+         if (ProgramValues::Movement::LEFT) {
+             ProgramValues::Camera::cameraPos -= glm::normalize(
+                 glm::cross(ProgramValues::Camera::cameraFront, ProgramValues::Camera::cameraUp))
+                 * ProgramValues::Camera::cameraSpeed;
+         }
+
+         if (ProgramValues::Movement::RIGHT) {
+             ProgramValues::Camera::cameraPos += glm::normalize(
+                 glm::cross(ProgramValues::Camera::cameraFront, ProgramValues::Camera::cameraUp))
+                 * ProgramValues::Camera::cameraSpeed;
+         }
+
+         if (ProgramValues::Movement::UP) {
+             ProgramValues::Camera::cameraPos += ProgramValues::Camera::cameraUp * ProgramValues::Camera::cameraSpeed;
+         }
+
+         if (ProgramValues::Movement::DOWN) {
+             ProgramValues::Camera::cameraPos -= ProgramValues::Camera::cameraUp * ProgramValues::Camera::cameraSpeed;
+         }
+     }
 
      texture->bind();
 }
@@ -259,12 +301,24 @@ Game::Game() {}
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-0.1f, 0.2f, 0.0f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.7f, 0.0f));
         draw(model);
 
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-0.05f, 0.05f, -0.2f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.2f, 1.0f, 0.1f));
+        draw(model);
+
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-0.7f, 0.0f, 0.4f));
+        model = glm::rotate(model, glm::radians(60.0f), glm::vec3(0.1f, 0.5f, 1.0f));
+        draw(model);
+
+        float time = SDL_GetTicks() / 1000.0f;
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, time * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
         draw(model);
     }
 

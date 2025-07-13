@@ -15,6 +15,8 @@ struct vec3 {
 };
 
 namespace ProgramValues {
+	extern bool windowFocused;
+	extern bool windowFocusedPressed;
 	extern float x;
 	extern float y;
 	extern float dimensionScalar;
@@ -30,5 +32,21 @@ namespace ProgramValues {
 		extern glm::vec3 cameraPos;
 		extern glm::vec3 cameraFront;
 		extern glm::vec3 cameraUp;
+
+		extern float yaw;
+		extern float pitch;
+		extern float sensitivity;
+
+		extern float fov;
+		extern float scrollSensitivity;
+	}
+
+	namespace Movement {
+		extern bool LEFT;
+		extern bool RIGHT;
+		extern bool FRONT;
+		extern bool BACK;
+		extern bool UP;
+		extern bool DOWN;
 	}
 }

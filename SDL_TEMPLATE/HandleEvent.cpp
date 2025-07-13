@@ -22,27 +22,29 @@ void HandleEvent::input(SDL_Event& event) {
             Game::getInstance()->setRunning(false);
         } else if (event.type == SDL_KEYDOWN) {
             switch (event.key.keysym.sym) {
+            case SDLK_ESCAPE:
+                if (!ProgramValues::windowFocusedPressed) {
+                    ProgramValues::windowFocused = !ProgramValues::windowFocused;
+                    ProgramValues::windowFocusedPressed = true;
+                }
+                break;
             case SDLK_w: 
-                ProgramValues::Camera::cameraPos += ProgramValues::Camera::cameraSpeed * ProgramValues::Camera::cameraFront;
+                ProgramValues::Movement::FRONT = true;
                 break;
             case SDLK_s: 
-                ProgramValues::Camera::cameraPos -= ProgramValues::Camera::cameraSpeed * ProgramValues::Camera::cameraFront;
+                ProgramValues::Movement::BACK = true;
                 break;
             case SDLK_a:
-                ProgramValues::Camera::cameraPos -= glm::normalize(
-                    glm::cross(ProgramValues::Camera::cameraFront, ProgramValues::Camera::cameraUp)) 
-                    * ProgramValues::Camera::cameraSpeed;
+                ProgramValues::Movement::LEFT = true;
                 break;
             case SDLK_d:
-                ProgramValues::Camera::cameraPos += glm::normalize(
-                    glm::cross(ProgramValues::Camera::cameraFront, ProgramValues::Camera::cameraUp)) 
-                    * ProgramValues::Camera::cameraSpeed;
+                ProgramValues::Movement::RIGHT = true;
                 break;
             case SDLK_SPACE:
-                ProgramValues::Camera::cameraPos += ProgramValues::Camera::cameraUp * ProgramValues::Camera::cameraSpeed;
+                ProgramValues::Movement::UP = true;
                 break;
             case SDLK_LCTRL:
-                ProgramValues::Camera::cameraPos -= ProgramValues::Camera::cameraUp * ProgramValues::Camera::cameraSpeed;
+                ProgramValues::Movement::DOWN = true;
                 break;
             case SDLK_MINUS:
                 if (ProgramValues::dimensionScalar >= scalarValue)
@@ -65,12 +67,55 @@ void HandleEvent::input(SDL_Event& event) {
                 break;
             default: break;
             }
+        } else if (event.type == SDL_KEYUP) {
+            switch (event.key.keysym.sym) {
+            case SDLK_ESCAPE:
+                ProgramValues::windowFocusedPressed = false;
+                break;
+            case SDLK_w:
+                ProgramValues::Movement::FRONT = false;
+                break;
+            case SDLK_s:
+                ProgramValues::Movement::BACK = false;
+                break;
+            case SDLK_a:
+                ProgramValues::Movement::LEFT = false;
+                break;
+            case SDLK_d:
+                ProgramValues::Movement::RIGHT = false;
+                break;
+            case SDLK_SPACE:
+                ProgramValues::Movement::UP = false;
+                break;
+            case SDLK_LCTRL:
+                ProgramValues::Movement::DOWN = false;
+                break;
+            default: break;
+            }
         } else if (event.type == SDL_MOUSEWHEEL) {
-            if (event.wheel.y > 0) {
-                    ProgramValues::dimensionScalar += scalarValue;
-            } else if (event.wheel.y < 0) {
-                if (ProgramValues::dimensionScalar >= scalarValue)
-                    ProgramValues::dimensionScalar -= scalarValue;
+            ProgramValues::Camera::fov -= event.wheel.y * ProgramValues::Camera::scrollSensitivity;
+
+            if (ProgramValues::Camera::fov < 1.0f) ProgramValues::Camera::fov = 1.0f;
+            if (ProgramValues::Camera::fov > 60.0f) ProgramValues::Camera::fov = 60.0f;
+        } else if (event.type == SDL_MOUSEMOTION) {
+            if (ProgramValues::windowFocused) {
+                float xoffset = event.motion.xrel * ProgramValues::Camera::sensitivity;
+                float yoffset = event.motion.yrel * ProgramValues::Camera::sensitivity;
+
+                ProgramValues::Camera::yaw += xoffset;
+                ProgramValues::Camera::pitch -= yoffset;
+
+                if (ProgramValues::Camera::pitch > 89.0f)
+                    ProgramValues::Camera::pitch = 89.0f;
+                if (ProgramValues::Camera::pitch < -89.0f)
+                    ProgramValues::Camera::pitch = -89.0f;
+
+                glm::vec3 direction;
+                direction.x = cos(glm::radians(ProgramValues::Camera::yaw)) * cos(glm::radians(ProgramValues::Camera::pitch));
+                direction.y = sin(glm::radians(ProgramValues::Camera::pitch));
+                direction.z = sin(glm::radians(ProgramValues::Camera::yaw)) * cos(glm::radians(ProgramValues::Camera::pitch));
+
+                ProgramValues::Camera::cameraFront = glm::normalize(direction);
             }
         }
     }
