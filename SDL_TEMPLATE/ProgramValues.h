@@ -1,4 +1,5 @@
 #pragma once
+#include <glm/glm.hpp>
 
 struct vec4 {
 	float r;
@@ -23,4 +24,11 @@ namespace ProgramValues {
 	extern vec4 v4_color;
 	extern int ProgramDimensionX;
 	extern int ProgramDimensionY;
+	
+	namespace Camera {
+		extern float cameraSpeed;
+		extern glm::vec3 cameraPos;
+		extern glm::vec3 cameraFront;
+		extern glm::vec3 cameraUp;
+	}
 }

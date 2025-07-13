@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\..\glad\src\glad.c" />
     <ClCompile Include="ElementBuffer.cpp" />
+    <ClCompile Include="FPSManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="HandleEvent.cpp" />
     <ClCompile Include="ImGUIWindow.cpp" />
@@ -47,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ElementBuffer.h" />
+    <ClInclude Include="FPSManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="HandleEvent.h" />
     <ClInclude Include="ImGUIWindow.h" />

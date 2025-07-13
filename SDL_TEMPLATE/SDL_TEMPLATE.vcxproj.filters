@@ -99,6 +99,9 @@
     <ClCompile Include="stb.cpp">
       <Filter>Source Files\vendors</Filter>
     </ClCompile>
+    <ClCompile Include="FPSManager.cpp">
+      <Filter>Source Files\custom</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig">
@@ -170,6 +173,9 @@
       <Filter>Header Files\custom</Filter>
     </ClInclude>
     <ClInclude Include="VertexArray.h">
+      <Filter>Header Files\custom</Filter>
+    </ClInclude>
+    <ClInclude Include="FPSManager.h">
       <Filter>Header Files\custom</Filter>
     </ClInclude>
   </ItemGroup>

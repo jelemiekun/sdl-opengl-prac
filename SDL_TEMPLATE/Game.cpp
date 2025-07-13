@@ -269,13 +269,12 @@ Game::Game() {}
     }
 
     {
-        float time = SDL_GetTicks() / 1000.0f;
-        float camX = sin(time);
-        float camZ = cos(time);
         glm::mat4 view;
-        view = glm::lookAt(glm::vec3(camX, 0.0, camZ),
-            glm::vec3(0.0, 0.0, 0.0),
-            glm::vec3(0.0, 1.0, 0.0));
+        view = glm::lookAt(
+            ProgramValues::Camera::cameraPos, 
+            ProgramValues::Camera::cameraPos + ProgramValues::Camera::cameraFront, 
+            ProgramValues::Camera::cameraUp
+        );
 
         glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_View"), 1, GL_FALSE, &view[0][0]);
 

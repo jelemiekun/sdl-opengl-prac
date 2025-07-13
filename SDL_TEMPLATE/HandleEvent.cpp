@@ -23,16 +23,26 @@ void HandleEvent::input(SDL_Event& event) {
         } else if (event.type == SDL_KEYDOWN) {
             switch (event.key.keysym.sym) {
             case SDLK_w: 
-                ProgramValues::y -= movementValue;
+                ProgramValues::Camera::cameraPos += ProgramValues::Camera::cameraSpeed * ProgramValues::Camera::cameraFront;
                 break;
             case SDLK_s: 
-                ProgramValues::y += movementValue;
+                ProgramValues::Camera::cameraPos -= ProgramValues::Camera::cameraSpeed * ProgramValues::Camera::cameraFront;
                 break;
             case SDLK_a:
-                ProgramValues::x += movementValue;
+                ProgramValues::Camera::cameraPos -= glm::normalize(
+                    glm::cross(ProgramValues::Camera::cameraFront, ProgramValues::Camera::cameraUp)) 
+                    * ProgramValues::Camera::cameraSpeed;
                 break;
             case SDLK_d:
-                ProgramValues::x -= movementValue;
+                ProgramValues::Camera::cameraPos += glm::normalize(
+                    glm::cross(ProgramValues::Camera::cameraFront, ProgramValues::Camera::cameraUp)) 
+                    * ProgramValues::Camera::cameraSpeed;
+                break;
+            case SDLK_SPACE:
+                ProgramValues::Camera::cameraPos += ProgramValues::Camera::cameraUp * ProgramValues::Camera::cameraSpeed;
+                break;
+            case SDLK_LCTRL:
+                ProgramValues::Camera::cameraPos -= ProgramValues::Camera::cameraUp * ProgramValues::Camera::cameraSpeed;
                 break;
             case SDLK_MINUS:
                 if (ProgramValues::dimensionScalar >= scalarValue)
@@ -42,12 +52,16 @@ void HandleEvent::input(SDL_Event& event) {
                 ProgramValues::dimensionScalar += scalarValue;
                 break;
             case SDLK_UP:
+                ProgramValues::y -= movementValue;
                 break;
             case SDLK_DOWN:
+                ProgramValues::y += movementValue;
                 break;
             case SDLK_LEFT:
+                ProgramValues::x += movementValue;
                 break;
             case SDLK_RIGHT:
+                ProgramValues::x -= movementValue;
                 break;
             default: break;
             }
