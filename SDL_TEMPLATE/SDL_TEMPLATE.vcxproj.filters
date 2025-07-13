@@ -63,34 +63,7 @@
     <ClCompile Include="imgui\imgui_widgets.cpp">
       <Filter>Source Files\vendors\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="ElementBuffer.cpp">
-      <Filter>Source Files\custom</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>Source Files\custom</Filter>
-    </ClCompile>
-    <ClCompile Include="HandleEvent.cpp">
-      <Filter>Source Files\custom</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGUIWindow.cpp">
-      <Filter>Source Files\custom</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files\custom</Filter>
-    </ClCompile>
-    <ClCompile Include="ProgramValues.cpp">
-      <Filter>Source Files\custom</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files\custom</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files\custom</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexArray.cpp">
-      <Filter>Source Files\custom</Filter>
-    </ClCompile>
-    <ClCompile Include="VertexBuffer.cpp">
       <Filter>Source Files\custom</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\..\glad\src\glad.c">
@@ -98,9 +71,6 @@
     </ClCompile>
     <ClCompile Include="stb.cpp">
       <Filter>Source Files\vendors</Filter>
-    </ClCompile>
-    <ClCompile Include="FPSManager.cpp">
-      <Filter>Source Files\custom</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -147,36 +117,6 @@
     </ClInclude>
     <ClInclude Include="stb.h">
       <Filter>Header Files\vendors\stb</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexBuffer.h">
-      <Filter>Header Files\custom</Filter>
-    </ClInclude>
-    <ClInclude Include="ElementBuffer.h">
-      <Filter>Header Files\custom</Filter>
-    </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>Header Files\custom</Filter>
-    </ClInclude>
-    <ClInclude Include="HandleEvent.h">
-      <Filter>Header Files\custom</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGUIWindow.h">
-      <Filter>Header Files\custom</Filter>
-    </ClInclude>
-    <ClInclude Include="ProgramValues.h">
-      <Filter>Header Files\custom</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files\custom</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files\custom</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexArray.h">
-      <Filter>Header Files\custom</Filter>
-    </ClInclude>
-    <ClInclude Include="FPSManager.h">
-      <Filter>Header Files\custom</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -20,11 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\..\..\glad\src\glad.c" />
-    <ClCompile Include="ElementBuffer.cpp" />
-    <ClCompile Include="FPSManager.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="HandleEvent.cpp" />
-    <ClCompile Include="ImGUIWindow.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
     <ClCompile Include="imgui\imgui_demo.cpp" />
     <ClCompile Include="imgui\imgui_draw.cpp" />
@@ -34,12 +29,7 @@
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="ProgramValues.cpp" />
-    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="VertexArray.cpp" />
-    <ClCompile Include="VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
@@ -47,11 +37,6 @@
     <None Include="source.shader" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ElementBuffer.h" />
-    <ClInclude Include="FPSManager.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="HandleEvent.h" />
-    <ClInclude Include="ImGUIWindow.h" />
     <ClInclude Include="imgui\imconfig.h" />
     <ClInclude Include="imgui\imgui.h" />
     <ClInclude Include="imgui\imgui_impl_opengl3.h" />
@@ -62,12 +47,7 @@
     <ClInclude Include="imgui\imstb_rectpack.h" />
     <ClInclude Include="imgui\imstb_textedit.h" />
     <ClInclude Include="imgui\imstb_truetype.h" />
-    <ClInclude Include="ProgramValues.h" />
-    <ClInclude Include="Shader.h" />
     <ClInclude Include="stb.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="VertexArray.h" />
-    <ClInclude Include="VertexBuffer.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
