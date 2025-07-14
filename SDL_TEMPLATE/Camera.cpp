@@ -32,13 +32,14 @@ void Camera::processKeyboard(SDL_Event& event, GameWindow* window) {
                     }
                 }
                 break;
-            case SDLK_w:     ProgramValues::moveForwardPressed = true; break;
-            case SDLK_a:     ProgramValues::moveLeftPressed = true; break;
+            case SDLK_w:     ProgramValues::moveForwardPressed  = true; break;
+            case SDLK_a:     ProgramValues::moveLeftPressed     = true; break;
             case SDLK_s:     ProgramValues::moveBackwardPressed = true; break;
-            case SDLK_d:     ProgramValues::moveRightPressed = true; break;
-            case SDLK_SPACE: ProgramValues::moveUpPressed = true; break;
-            case SDLK_LCTRL: ProgramValues::moveDownPressed= true; break;
-            case SDLK_r:     ProgramValues::sprinting = true; break;
+            case SDLK_d:     ProgramValues::moveRightPressed    = true; break;
+            case SDLK_SPACE: ProgramValues::moveUpPressed       = true; break;
+            case SDLK_LCTRL: ProgramValues::moveDownPressed     = true; break;
+            case SDLK_r:     ProgramValues::sprinting           = true; break;
+            case SDLK_LSHIFT:ProgramValues::fastZoom            = true; break;
             default: break;
         }
     } else if (event.type == SDL_KEYUP) {
@@ -48,13 +49,14 @@ void Camera::processKeyboard(SDL_Event& event, GameWindow* window) {
                     ProgramValues::isLockedInPressed = false;
                 }
                 break;
-            case SDLK_w:     ProgramValues::moveForwardPressed = false; break;
-            case SDLK_a:     ProgramValues::moveLeftPressed = false; break;
+            case SDLK_w:     ProgramValues::moveForwardPressed  = false; break;
+            case SDLK_a:     ProgramValues::moveLeftPressed     = false; break;
             case SDLK_s:     ProgramValues::moveBackwardPressed = false; break;
-            case SDLK_d:     ProgramValues::moveRightPressed = false; break;
-            case SDLK_SPACE: ProgramValues::moveUpPressed = false; break;
-            case SDLK_LCTRL: ProgramValues::moveDownPressed = false; break;
-            case SDLK_r:     ProgramValues::sprinting = false; break;
+            case SDLK_d:     ProgramValues::moveRightPressed    = false; break;
+            case SDLK_SPACE: ProgramValues::moveUpPressed       = false; break;
+            case SDLK_LCTRL: ProgramValues::moveDownPressed     = false; break;
+            case SDLK_r:     ProgramValues::sprinting           = false; break;
+            case SDLK_LSHIFT:ProgramValues::fastZoom            = false; break;
             default: break;
         }
     }
@@ -69,7 +71,7 @@ void Camera::processMouseMotion(SDL_Event& event) {
         yoffset *= sensitivity;
 
         yaw += xoffset;
-        pitch -= yoffset;
+        pitch -= yoffset;   
 
         if (pitch > 89.0f)
             pitch = 89.0f;
@@ -78,6 +80,13 @@ void Camera::processMouseMotion(SDL_Event& event) {
     } else if (event.type == SDL_MOUSEBUTTONDOWN) {
         if (!ProgramValues::isLockedIn)
             ProgramValues::isLockedIn = true;
+    } else if (event.type == SDL_MOUSEWHEEL && ProgramValues::isLockedIn) {
+        float localSensitivity =
+            ProgramValues::fastZoom ? event.wheel.y * sensitivity * FOV_SPEED_MULTIPLIER : event.wheel.y * sensitivity;
+        fov -= localSensitivity;
+
+        if (fov < 1.0f) fov = 1.0f;
+        if (fov > FOV_MAX) fov = FOV_MAX;
     }
 }
 
@@ -112,4 +121,8 @@ void Camera::updateCameraVectors() {
 
     right = glm::normalize(glm::cross(front, worldUp));
     up = glm::normalize(glm::cross(right, front));
+}
+
+float Camera::getFOV() const {
+    return fov;
 }

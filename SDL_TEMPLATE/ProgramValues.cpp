@@ -10,4 +10,5 @@ namespace ProgramValues {
 	bool moveUpPressed = false;
 	bool moveDownPressed = false;
 	bool sprinting = false;
+	bool fastZoom = false;
 }

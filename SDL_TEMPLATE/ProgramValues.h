@@ -9,5 +9,6 @@ namespace ProgramValues {
 	extern bool moveUpPressed;
 	extern bool moveDownPressed;
 	extern bool sprinting;
+	extern bool fastZoom;
 };
 

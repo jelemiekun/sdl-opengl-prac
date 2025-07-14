@@ -207,7 +207,7 @@ void GameWindow::render() {
 
     {
         glm::mat4 projection = glm::perspective(
-            glm::radians(45.0f), 
+            glm::radians(camera->getFOV()), 
             (float)mWidth / (float)mHeight,
             0.1f, 
             100.0f
