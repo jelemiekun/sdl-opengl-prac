@@ -1,13 +1,15 @@
 #include "GameWindow.h"
 #include <spdlog/spdlog.h>
 #include <glad/glad.h>
+#include <memory>
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "Camera.h"
-#include <memory>
+#include "Game.h"
+#include "ProgramValues.h"
 
 static constexpr int INITIAL_WIDTH = 1280;
 static constexpr int INITIAL_HEIGHT = 720;
@@ -144,10 +146,17 @@ void GameWindow::handleEvent(SDL_Event& e) {
                 spdlog::info("Window {} resized to {}x{}", mWindowID, mWidth, mHeight);
                 break;
 
+            case SDL_WINDOWEVENT_RESTORED:
+                ProgramValues::isLockedIn = true;
+                spdlog::info("Window {} restored", mWindowID);
+                break;
+
             case SDL_WINDOWEVENT_CLOSE:
+                Game* game = Game::getInstance();
+                game->setRunning(false);
                 SDL_HideWindow(mWindow);
                 mShown = false;
-                spdlog::info("Window {} closed (hidden)", mWindowID);
+                spdlog::info("Window {} closed and program stopping", mWindowID);
                 break;
         }
     }
@@ -204,8 +213,16 @@ void GameWindow::render() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     shader->use();
+    texture->bind(0); 
+    shader->setInt("texture1", 0);
+    vao->Bind();
 
     {
+        auto draw = [this](glm::mat4& model) -> void {
+            glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Model"), 1, GL_FALSE, &model[0][0]);
+            glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
+        };
+
         glm::mat4 projection = glm::perspective(
             glm::radians(camera->getFOV()), 
             (float)mWidth / (float)mHeight,
@@ -219,14 +236,14 @@ void GameWindow::render() {
 
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::scale(model, glm::vec3(16.0f, 9.0f, 5.0f));
-        glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Model"), 1, GL_FALSE, &model[0][0]);
+        draw(model);
+
+        glm::mat4 light = glm::mat4(1.0f);
+        light = glm::translate(light, glm::vec3(0.0f, 2.0f, 0.0f));
+        draw(light);
     }
 
-    texture->bind(0); 
-    shader->setInt("texture1", 0);
-    vao->Bind();
 
-    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
 
     SDL_GL_SwapWindow(mWindow);
 }
@@ -241,6 +258,10 @@ bool GameWindow::isShown() { return mShown; }
 
 SDL_Window* GameWindow::getWindow() {
     return mWindow ? mWindow : nullptr;
+}
+
+SDL_GLContext& GameWindow::getGLContext() {
+    return openGLContext;
 }
 
 void GameWindow::initVariables() {

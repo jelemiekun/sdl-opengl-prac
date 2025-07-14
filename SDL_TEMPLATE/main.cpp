@@ -20,5 +20,7 @@ int SDL_main(int argc, char* argv[]) {
         FPSManager::calculateAverageFPS(countFrame, startTime);
     }
 
+    game->clean();
+
     return 0;
 }

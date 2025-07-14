@@ -4,6 +4,7 @@
 #include <memory>
 
 class GameWindow;
+class ImGuiWindow;
 
 class Game {
 private:
@@ -20,6 +21,7 @@ public:
 private:
     bool running;
     GameWindow* gameWindow;
+    ImGuiWindow* imGuiWindow;
     SDL_Event event;
 
 private:
@@ -27,6 +29,7 @@ private:
 
     bool initSDL();
     bool initGLAD();
+    void initImGui();
 
 public:
     void initializeEverything();
@@ -36,6 +39,7 @@ public:
     void render();
 
     const bool& isRunning() const;
+    void setRunning(bool value);
 
     void clean();
 };

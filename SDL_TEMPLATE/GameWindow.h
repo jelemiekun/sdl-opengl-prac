@@ -35,6 +35,7 @@ public:
     bool isMinimized();
     bool isShown();
     SDL_Window* getWindow();
+    SDL_GLContext& getGLContext();
 
 private:
     void initVariables();

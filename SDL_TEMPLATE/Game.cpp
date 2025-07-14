@@ -3,8 +3,9 @@
 #include <glad/glad.h>
 #include "GameWindow.h"
 #include "ProgramValues.h"
+#include "ImGuiWindow.h"
 
-Game::Game() : running(false), gameWindow(nullptr) {}
+Game::Game() : running(false), gameWindow(nullptr), imGuiWindow(nullptr) {}
 
 Game* Game::getInstance() {
     static Game instance;
@@ -51,11 +52,18 @@ bool Game::initGLAD() {
     return true;
 }
 
+void Game::initImGui() {
+    imGuiWindow = ImGuiWindow::getInstance();
+    imGuiWindow->init(gameWindow->getWindow(), gameWindow->getGLContext());
+}
+
 void Game::initializeEverything() {
     spdlog::info("Initializing program...");
     bool initializationSuccess = initSDL() && gameWindow->initOpenGLContext() && initGLAD();
 
     if (initializationSuccess) {
+        initImGui();
+
         gameWindow->setupDraw();
 
         spdlog::info("Program initialized successfully.");
@@ -80,12 +88,18 @@ void Game::update() {
 
 void Game::render() {
     gameWindow->render();
+    imGuiWindow->render();
 }
 
 const bool& Game::isRunning() const {
     return running;
 }
 
+void Game::setRunning(bool value) {
+    running = value;
+}
+
 void Game::clean() {
     gameWindow->free();
+    imGuiWindow->clean();
 }
