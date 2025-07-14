@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <glm/gtc/type_ptr.hpp>
 
 Shader::Shader(const char* sourcePath) : usable(false) {
 	std::string vertexShaderSource = parseShaderSource(sourcePath, Shader_Type::Vertex);
@@ -151,9 +152,9 @@ void Shader::setFloat(const std::string& name, float  value) {
 }
 
 void Shader::setVec3(const std::string& name, const glm::vec3& value) {
-	glUniform3fv(getUniformLocation(name), 1, &value[0]);
+	glUniform3fv(getUniformLocation(name), 1, glm::value_ptr(value));
 }
 
 void Shader::setMat4(const std::string& name, const glm::mat4& value) {
-	glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &value[0][0]);
+	glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value));
 }

@@ -18,17 +18,16 @@ static constexpr int INITIAL_WIDTH = 1280;
 static constexpr int INITIAL_HEIGHT = 720;
 
 static int indicesCount;
+static std::unique_ptr<Texture> texture;
+static std::unique_ptr<VertexBuffer> vbo;
+static std::unique_ptr<ElementBuffer> ebo;
+static std::unique_ptr<Camera> camera;
+
 static std::unique_ptr<Shader> shaderObject;
 static std::unique_ptr<VertexArray> vaoObject;
 
 static std::unique_ptr<Shader> shaderLight;
 static std::unique_ptr<VertexArray> vaoLight;
-
-static std::unique_ptr<Texture> texture;
-static std::unique_ptr<VertexBuffer> vbo;
-static std::unique_ptr<ElementBuffer> ebo;
-
-static std::unique_ptr<Camera> camera;
 
 // Constructor
 GameWindow::GameWindow()
@@ -127,13 +126,12 @@ void GameWindow::setupDraw() {
     ebo->Bind();
     vaoObject->Unbind();
 
-
     shaderLight = std::make_unique<Shader>("light.shader");
-
+    
     vaoLight = std::make_unique<VertexArray>();
     vaoLight->Bind();
+    ebo->Bind();
     vaoLight->AddBuffer(*vbo, { 3 });
-    vaoLight->Unbind();
 
 
     texture = std::make_unique<Texture>("assets/pic.jpg");
@@ -219,49 +217,65 @@ void GameWindow::toggleFullscreen() {
 void GameWindow::update() {
     camera->update();
 }
+
 void GameWindow::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    glm::mat4 projection = glm::perspective(glm::radians(camera->getFOV()), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(
+        glm::radians(camera->getFOV()), 
+        (float)mWidth / (float)mHeight,
+        0.1f, 
+        100.0f
+    );
     glm::mat4 view = camera->getViewMatrix();
 
-    // Draw main object
+    auto drawModel = [this](Shader& shader, glm::mat4& model) -> void {
+        shader.setMat4("u_Model", model);
+        glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
+    };
+
+    // texture->bind(0); 
+    // shaderObject->setInt("texture1", 0);
+
     shaderObject->use();
     vaoObject->Bind();
-
-    shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.0f, 0.31f));  // pink-ish
-    shaderObject->setVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    
+    glm::mat4 objectModel = glm::mat4(1.0f);
+    objectModel = glm::scale(objectModel, glm::vec3(16.0f, 9.0f, 5.0f));
+    
+    shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+    shaderObject->setVec3("u_LightColor", glm::vec3(1.0f));
     shaderObject->setMat4("u_Projection", projection);
     shaderObject->setMat4("u_View", view);
+    shaderObject->setMat4("u_Model", objectModel);
 
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(16.0f, 9.0f, 5.0f));
-    shaderObject->setMat4("u_Model", model);
+    drawModel(*shaderObject, objectModel);
 
-    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
-
-    // Draw light cube using SAME VAO (vaoObject)
+    
     shaderLight->use();
-    vaoObject->Bind();  // <- IMPORTANT: reuse same VAO with EBO
-
-    shaderLight->setMat4("u_Projection", projection);
-    shaderLight->setMat4("u_View", view);
+    vaoLight->Bind();
 
     glm::mat4 lightModel = glm::mat4(1.0f);
     lightModel = glm::translate(lightModel, ProgramValues::LightSource::position);
     lightModel = glm::scale(lightModel, ProgramValues::LightSource::scale);
     lightModel = glm::rotate(lightModel, glm::radians(static_cast<float>(ProgramValues::LightSource::rotateDegrees)), ProgramValues::LightSource::rotate);
+    
+
+    // shaderLight->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+    // shaderLight->setVec3("u_LightColor", glm::vec3(1.0f));
+    shaderLight->setMat4("u_Projection", projection);
+    shaderLight->setMat4("u_View", view);
     shaderLight->setMat4("u_Model", lightModel);
 
-    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
+    drawModel(*shaderLight, lightModel);
+
 
     game->imGuiWindow->render();
     SDL_GL_SwapWindow(mWindow);
 }
-
 
 // Getters
 int GameWindow::width() { return mWidth; }
