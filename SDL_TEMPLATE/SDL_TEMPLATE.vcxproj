@@ -45,6 +45,7 @@
   <ItemGroup>
     <None Include="..\.gitignore" />
     <None Include=".editorconfig" />
+    <None Include="light.shader" />
     <None Include="source.shader" />
   </ItemGroup>
   <ItemGroup>

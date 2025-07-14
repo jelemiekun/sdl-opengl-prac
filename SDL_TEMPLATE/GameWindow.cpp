@@ -18,11 +18,16 @@ static constexpr int INITIAL_WIDTH = 1280;
 static constexpr int INITIAL_HEIGHT = 720;
 
 static int indicesCount;
-static std::unique_ptr<Shader> shader;
+static std::unique_ptr<Shader> shaderObject;
+static std::unique_ptr<VertexArray> vaoObject;
+
+static std::unique_ptr<Shader> shaderLight;
+static std::unique_ptr<VertexArray> vaoLight;
+
 static std::unique_ptr<Texture> texture;
-static std::unique_ptr<VertexArray> vao;
 static std::unique_ptr<VertexBuffer> vbo;
 static std::unique_ptr<ElementBuffer> ebo;
+
 static std::unique_ptr<Camera> camera;
 
 // Constructor
@@ -59,38 +64,38 @@ void GameWindow::setupDraw() {
         0.0f
     );
 
-    shader = std::make_unique<Shader>("source.shader");
+    shaderObject = std::make_unique<Shader>("source.shader");
 
     std::vector<GLfloat> vertices = {
-            -0.2f,  0.11f,  0.2f,   0.0f, 1.0f,
-             0.2f,  0.11f,  0.2f,   1.0f, 1.0f,
-            -0.2f, -0.11f,  0.2f,   0.0f, 0.0f,
-             0.2f, -0.11f,  0.2f,   1.0f, 0.0f,
+            -0.2f,  0.11f,  0.2f, //  0.0f, 1.0f,
+             0.2f,  0.11f,  0.2f, //  1.0f, 1.0f,
+            -0.2f, -0.11f,  0.2f, //  0.0f, 0.0f,
+             0.2f, -0.11f,  0.2f, //  1.0f, 0.0f,
 
-             -0.2f,  0.11f, -0.2f,   0.0f, 1.0f,
-              0.2f,  0.11f, -0.2f,   1.0f, 1.0f,
-             -0.2f, -0.11f, -0.2f,   0.0f, 0.0f,
-              0.2f, -0.11f, -0.2f,   1.0f, 0.0f,
+             -0.2f,  0.11f, -0.2f, //  0.0f, 1.0f,
+              0.2f,  0.11f, -0.2f, //  1.0f, 1.0f,
+             -0.2f, -0.11f, -0.2f, //  0.0f, 0.0f,
+              0.2f, -0.11f, -0.2f, //  1.0f, 0.0f,
               
-              -0.2f,  0.11f, -0.2f,   0.0f, 1.0f,
-              -0.2f,  0.11f,  0.2f,   1.0f, 1.0f,
-              -0.2f, -0.11f, -0.2f,   0.0f, 0.0f,
-              -0.2f, -0.11f,  0.2f,   1.0f, 0.0f,
+              -0.2f,  0.11f, -0.2f, //  0.0f, 1.0f,
+              -0.2f,  0.11f,  0.2f, //  1.0f, 1.0f,
+              -0.2f, -0.11f, -0.2f, //  0.0f, 0.0f,
+              -0.2f, -0.11f,  0.2f, //  1.0f, 0.0f,
 
-               0.2f,  0.11f,  0.2f,   0.0f, 1.0f,
-               0.2f,  0.11f, -0.2f,   1.0f, 1.0f,
-               0.2f, -0.11f,  0.2f,   0.0f, 0.0f,
-               0.2f, -0.11f, -0.2f,   1.0f, 0.0f,
+               0.2f,  0.11f,  0.2f, //  0.0f, 1.0f,
+               0.2f,  0.11f, -0.2f, //  1.0f, 1.0f,
+               0.2f, -0.11f,  0.2f, //  0.0f, 0.0f,
+               0.2f, -0.11f, -0.2f, //  1.0f, 0.0f,
 
-               -0.2f,  0.11f, -0.2f,   0.0f, 1.0f,
-                0.2f,  0.11f, -0.2f,   1.0f, 1.0f,
-               -0.2f,  0.11f,  0.2f,   0.0f, 0.0f,
-                0.2f,  0.11f,  0.2f,   1.0f, 0.0f,
+               -0.2f,  0.11f, -0.2f, //  0.0f, 1.0f,
+                0.2f,  0.11f, -0.2f, //  1.0f, 1.0f,
+               -0.2f,  0.11f,  0.2f, //  0.0f, 0.0f,
+                0.2f,  0.11f,  0.2f, //  1.0f, 0.0f,
 
-                -0.2f, -0.11f,  0.2f,   0.0f, 1.0f,
-                 0.2f, -0.11f,  0.2f,   1.0f, 1.0f,
-                -0.2f, -0.11f, -0.2f,   0.0f, 0.0f,
-                 0.2f, -0.11f, -0.2f,   1.0f, 0.0f
+                -0.2f, -0.11f,  0.2f, //  0.0f, 1.0f,
+                 0.2f, -0.11f,  0.2f, //  1.0f, 1.0f,
+                -0.2f, -0.11f, -0.2f, //  0.0f, 0.0f,
+                 0.2f, -0.11f, -0.2f//,   1.0f, 0.0f
     };
 
     std::vector<GLuint> indices = {
@@ -111,18 +116,25 @@ void GameWindow::setupDraw() {
 
     indicesCount = indices.size();
 
-    vao = std::make_unique<VertexArray>();
+    vaoObject = std::make_unique<VertexArray>();
     vbo = std::make_unique<VertexBuffer>(vertices.data(), vertices.size() * sizeof(GLfloat));
 
-    vao->AddBuffer(*vbo, { 3, 2 });
+    vaoObject->AddBuffer(*vbo, { 3 });
 
     ebo = std::make_unique<ElementBuffer>(indices.data(), indicesCount);
 
-    vao->Bind();
+    vaoObject->Bind();
     ebo->Bind();
-    vao->Unbind();
+    vaoObject->Unbind();
 
-    shader->use();
+
+    shaderLight = std::make_unique<Shader>("light.shader");
+
+    vaoLight = std::make_unique<VertexArray>();
+    vaoLight->Bind();
+    vaoLight->AddBuffer(*vbo, { 3 });
+    vaoLight->Unbind();
+
 
     texture = std::make_unique<Texture>("assets/pic.jpg");
 }
@@ -207,49 +219,49 @@ void GameWindow::toggleFullscreen() {
 void GameWindow::update() {
     camera->update();
 }
-
 void GameWindow::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    shader->use();
-    texture->bind(0); 
-    shader->setInt("texture1", 0);
-    vao->Bind();
+    glm::mat4 projection = glm::perspective(glm::radians(camera->getFOV()), (float)mWidth / (float)mHeight, 0.1f, 100.0f);
+    glm::mat4 view = camera->getViewMatrix();
 
-    {
-        auto draw = [this](glm::mat4& model) -> void {
-            glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Model"), 1, GL_FALSE, &model[0][0]);
-            glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
-        };
+    // Draw main object
+    shaderObject->use();
+    vaoObject->Bind();
 
-        glm::mat4 projection = glm::perspective(
-            glm::radians(camera->getFOV()), 
-            (float)mWidth / (float)mHeight,
-            0.1f, 
-            100.0f
-        );
+    shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.0f, 0.31f));  // pink-ish
+    shaderObject->setVec3("u_LightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    shaderObject->setMat4("u_Projection", projection);
+    shaderObject->setMat4("u_View", view);
 
-        camera->setViewToShader(shader->ID, "u_View");
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::scale(model, glm::vec3(16.0f, 9.0f, 5.0f));
+    shaderObject->setMat4("u_Model", model);
 
-        glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Projection"), 1, GL_FALSE, &projection[0][0]);
+    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
 
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::scale(model, glm::vec3(16.0f, 9.0f, 5.0f));
-        draw(model);
+    // Draw light cube using SAME VAO (vaoObject)
+    shaderLight->use();
+    vaoObject->Bind();  // <- IMPORTANT: reuse same VAO with EBO
 
-        glm::mat4 light = glm::mat4(1.0f);
-        light = glm::translate(light, ProgramValues::LightSource::position);
-        light = glm::scale(light, ProgramValues::LightSource::scale);
-        light = glm::rotate(light, glm::radians(static_cast<float>(ProgramValues::LightSource::rotateDegrees)), ProgramValues::LightSource::rotate);
-        draw(light);
-    }
+    shaderLight->setMat4("u_Projection", projection);
+    shaderLight->setMat4("u_View", view);
+
+    glm::mat4 lightModel = glm::mat4(1.0f);
+    lightModel = glm::translate(lightModel, ProgramValues::LightSource::position);
+    lightModel = glm::scale(lightModel, ProgramValues::LightSource::scale);
+    lightModel = glm::rotate(lightModel, glm::radians(static_cast<float>(ProgramValues::LightSource::rotateDegrees)), ProgramValues::LightSource::rotate);
+    shaderLight->setMat4("u_Model", lightModel);
+
+    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
 
     game->imGuiWindow->render();
     SDL_GL_SwapWindow(mWindow);
 }
+
 
 // Getters
 int GameWindow::width() { return mWidth; }

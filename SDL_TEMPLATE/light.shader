@@ -22,11 +22,8 @@ void main() {
 #shader fragment
 #version 430 core
 
-uniform vec3 u_ObjectColor;
-uniform vec3 u_LightColor;
-
 out vec4 FragColor;
 
-void main() {
-    FragColor = vec4(u_LightColor * u_ObjectColor, 1.0);
+void main(){
+	FragColor = vec4(1.0f);
 }

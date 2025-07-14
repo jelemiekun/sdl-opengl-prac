@@ -1,5 +1,6 @@
 #include "Shader.h"
 #include <spdlog/spdlog.h>
+#include <glm/glm.hpp>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -147,4 +148,12 @@ void Shader::setInt(const std::string& name, int value) {
 
 void Shader::setFloat(const std::string& name, float  value) {
 	glUniform1f(getUniformLocation(name), value);
+}
+
+void Shader::setVec3(const std::string& name, const glm::vec3& value) {
+	glUniform3fv(getUniformLocation(name), 1, &value[0]);
+}
+
+void Shader::setMat4(const std::string& name, const glm::mat4& value) {
+	glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, &value[0][0]);
 }
