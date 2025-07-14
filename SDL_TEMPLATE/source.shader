@@ -1,8 +1,20 @@
 #shader vertex
 #version 430 core
 	
-void main() {
+layout (location = 0) in vec3 L_coordinates;
+layout (location = 1) in vec2 L_imgCoordinates;
 
+out vec2 imgCoordinates;
+
+uniform mat4 u_Model;
+uniform mat4 u_View;
+uniform mat4 u_Projection;
+
+void main() {
+	vec4 pos = vec4(L_coordinates, 1.0f);
+	pos = u_Projection * u_View * u_Model * pos;
+	gl_Position = pos;
+	imgCoordinates = L_imgCoordinates;
 }
 
 
@@ -10,6 +22,12 @@ void main() {
 #shader fragment
 #version 430 core
 
-void main(){
+in vec2 imgCoordinates;
+out vec4 FragColor;
 
+uniform sampler2D texture1;
+
+void main(){
+	vec4 textureColor = texture(texture1, imgCoordinates);
+	FragColor = textureColor;
 }

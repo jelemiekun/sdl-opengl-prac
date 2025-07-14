@@ -1,5 +1,7 @@
 #include "Camera.h"
 #include <SDL.h>
+#include "ProgramValues.h"
+#include "GameWindow.h"
 
 Camera::Camera(glm::vec3 startPosition = glm::vec3(0.0f, 0.0f, 3.0f),
     glm::vec3 startUp = glm::vec3(0.0f, 1.0f, 0.0f),
@@ -17,39 +19,88 @@ glm::mat4 Camera::getViewMatrix() const {
     return glm::lookAt(position, position + front, up);
 }
 
-void Camera::processKeyboard(const Uint8* keystates) {
-    if (keystates[SDL_SCANCODE_W])
-        position += speed * front;
-    if (keystates[SDL_SCANCODE_S])
-        position -= speed * front;
-    if (keystates[SDL_SCANCODE_A])
-        position -= glm::normalize(glm::cross(front, up)) * speed;
-    if (keystates[SDL_SCANCODE_D])
-        position += glm::normalize(glm::cross(front, up)) * speed;
-    if (keystates[SDL_SCANCODE_SPACE])
-        position += speed * up;
-    if (keystates[SDL_SCANCODE_LCTRL])
-        position -= speed * up;
+void Camera::processKeyboard(SDL_Event& event, GameWindow* window) {
+    if (event.type == SDL_KEYDOWN) {
+        switch (event.key.keysym.sym) {
+            case SDLK_ESCAPE:
+                if (!ProgramValues::isLockedInPressed) {
+                    ProgramValues::isLockedInPressed = true;
+                    ProgramValues::isLockedIn = !ProgramValues::isLockedIn;
+
+                    if (!ProgramValues::isLockedIn) {
+                        SDL_WarpMouseInWindow(window->getWindow(), window->width() / 2, window->height() / 2);
+                    }
+                }
+                break;
+            case SDLK_w:     ProgramValues::moveForwardPressed = true; break;
+            case SDLK_a:     ProgramValues::moveLeftPressed = true; break;
+            case SDLK_s:     ProgramValues::moveBackwardPressed = true; break;
+            case SDLK_d:     ProgramValues::moveRightPressed = true; break;
+            case SDLK_SPACE: ProgramValues::moveUpPressed = true; break;
+            case SDLK_LCTRL: ProgramValues::moveDownPressed= true; break;
+            case SDLK_r:     ProgramValues::sprinting = true; break;
+            default: break;
+        }
+    } else if (event.type == SDL_KEYUP) {
+        switch (event.key.keysym.sym) {
+            case SDLK_ESCAPE:
+                if (ProgramValues::isLockedInPressed) {
+                    ProgramValues::isLockedInPressed = false;
+                }
+                break;
+            case SDLK_w:     ProgramValues::moveForwardPressed = false; break;
+            case SDLK_a:     ProgramValues::moveLeftPressed = false; break;
+            case SDLK_s:     ProgramValues::moveBackwardPressed = false; break;
+            case SDLK_d:     ProgramValues::moveRightPressed = false; break;
+            case SDLK_SPACE: ProgramValues::moveUpPressed = false; break;
+            case SDLK_LCTRL: ProgramValues::moveDownPressed = false; break;
+            case SDLK_r:     ProgramValues::sprinting = false; break;
+            default: break;
+        }
+    }
 }
 
-void Camera::processMouseMotion(float xoffset, float yoffset) {
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
+void Camera::processMouseMotion(SDL_Event& event) {
+    if (event.type == SDL_MOUSEMOTION && ProgramValues::isLockedIn) {
+        float xoffset = static_cast<float>(event.motion.xrel);
+        float yoffset = static_cast<float>(event.motion.yrel);
 
-    yaw += xoffset;
-    pitch -= yoffset;
+        xoffset *= sensitivity;
+        yoffset *= sensitivity;
 
-    if (pitch > 89.0f)
-        pitch = 89.0f;
-    if (pitch < -89.0f)
-        pitch = -89.0f;
+        yaw += xoffset;
+        pitch -= yoffset;
 
-    updateCameraVectors();
+        if (pitch > 89.0f)
+            pitch = 89.0f;
+        if (pitch < -89.0f)
+            pitch = -89.0f;
+    } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+        if (!ProgramValues::isLockedIn)
+            ProgramValues::isLockedIn = true;
+    }
 }
 
 void Camera::setViewToShader(GLuint shaderID, const std::string& uniformName) const {
     glm::mat4 view = getViewMatrix();
     glUniformMatrix4fv(glGetUniformLocation(shaderID, uniformName.c_str()), 1, GL_FALSE, &view[0][0]);
+}
+
+void Camera::update() {
+    SDL_SetRelativeMouseMode(ProgramValues::isLockedIn ? SDL_TRUE : SDL_FALSE);
+
+    if (ProgramValues::isLockedIn) {
+        float modifiedSpeed = ProgramValues::sprinting ? speed * SPRINT_MULTIPLIER : speed;
+
+        if (ProgramValues::moveForwardPressed)  position += modifiedSpeed * front;
+        if (ProgramValues::moveLeftPressed)     position -= glm::normalize(glm::cross(front, up)) * modifiedSpeed;
+        if (ProgramValues::moveBackwardPressed) position -= modifiedSpeed * front;
+        if (ProgramValues::moveRightPressed)    position += glm::normalize(glm::cross(front, up)) * modifiedSpeed;
+        if (ProgramValues::moveUpPressed)       position += speed * up;
+        if (ProgramValues::moveDownPressed)     position -= speed * up;
+
+        updateCameraVectors();
+    }
 }
 
 void Camera::updateCameraVectors() {

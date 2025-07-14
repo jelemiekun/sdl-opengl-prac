@@ -14,6 +14,8 @@ Shader::Shader(const char* sourcePath) : usable(false) {
 	if (vertexShader == 0 || fragmentShader == 0) {
 		spdlog::error("Failed to create shader.");
 		return;
+	} else {
+		spdlog::info("Vertex and Fragment shader created successfully.");
 	}
 
 	createProgram(vertexShader, fragmentShader);

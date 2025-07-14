@@ -2,6 +2,7 @@
 #include <spdlog/spdlog.h>
 #include <glad/glad.h>
 #include "GameWindow.h"
+#include "ProgramValues.h"
 
 Game::Game() : running(false), gameWindow(nullptr) {}
 
@@ -55,6 +56,8 @@ void Game::initializeEverything() {
     bool initializationSuccess = initSDL() && gameWindow->initOpenGLContext() && initGLAD();
 
     if (initializationSuccess) {
+        gameWindow->setupDraw();
+
         spdlog::info("Program initialized successfully.");
         running = true;
     } else {
@@ -72,10 +75,11 @@ void Game::input() {
 }
 
 void Game::update() {
+    gameWindow->update();
 }
 
 void Game::render() {
-    
+    gameWindow->render();
 }
 
 const bool& Game::isRunning() const {

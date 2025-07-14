@@ -1,9 +1,24 @@
 #include "GameWindow.h"
 #include <spdlog/spdlog.h>
 #include <glad/glad.h>
+#include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "ElementBuffer.h"
+#include "Shader.h"
+#include "Texture.h"
+#include "Camera.h"
+#include <memory>
 
 static constexpr int INITIAL_WIDTH = 1280;
 static constexpr int INITIAL_HEIGHT = 720;
+
+static int indicesCount;
+static std::unique_ptr<Shader> shader;
+static std::unique_ptr<Texture> texture;
+static std::unique_ptr<VertexArray> vao;
+static std::unique_ptr<VertexBuffer> vbo;
+static std::unique_ptr<ElementBuffer> ebo;
+static std::unique_ptr<Camera> camera;
 
 // Constructor
 GameWindow::GameWindow()
@@ -30,6 +45,83 @@ bool GameWindow::init() {
     spdlog::info("Window initialized successfully");
     return true;
 }
+
+void GameWindow::setupDraw() {
+    camera = std::make_unique<Camera>(
+        glm::vec3(0.0f, 0.0f, 3.0f),
+        glm::vec3(0.0f, 1.0f, 0.0f),
+        -90.0f,
+        0.0f
+    );
+
+    shader = std::make_unique<Shader>("source.shader");
+
+    std::vector<GLfloat> vertices = {
+            -0.2f,  0.11f,  0.2f,   0.0f, 1.0f,
+             0.2f,  0.11f,  0.2f,   1.0f, 1.0f,
+            -0.2f, -0.11f,  0.2f,   0.0f, 0.0f,
+             0.2f, -0.11f,  0.2f,   1.0f, 0.0f,
+
+             -0.2f,  0.11f, -0.2f,   0.0f, 1.0f,
+              0.2f,  0.11f, -0.2f,   1.0f, 1.0f,
+             -0.2f, -0.11f, -0.2f,   0.0f, 0.0f,
+              0.2f, -0.11f, -0.2f,   1.0f, 0.0f,
+              
+              -0.2f,  0.11f, -0.2f,   0.0f, 1.0f,
+              -0.2f,  0.11f,  0.2f,   1.0f, 1.0f,
+              -0.2f, -0.11f, -0.2f,   0.0f, 0.0f,
+              -0.2f, -0.11f,  0.2f,   1.0f, 0.0f,
+
+               0.2f,  0.11f,  0.2f,   0.0f, 1.0f,
+               0.2f,  0.11f, -0.2f,   1.0f, 1.0f,
+               0.2f, -0.11f,  0.2f,   0.0f, 0.0f,
+               0.2f, -0.11f, -0.2f,   1.0f, 0.0f,
+
+               -0.2f,  0.11f, -0.2f,   0.0f, 1.0f,
+                0.2f,  0.11f, -0.2f,   1.0f, 1.0f,
+               -0.2f,  0.11f,  0.2f,   0.0f, 0.0f,
+                0.2f,  0.11f,  0.2f,   1.0f, 0.0f,
+
+                -0.2f, -0.11f,  0.2f,   0.0f, 1.0f,
+                 0.2f, -0.11f,  0.2f,   1.0f, 1.0f,
+                -0.2f, -0.11f, -0.2f,   0.0f, 0.0f,
+                 0.2f, -0.11f, -0.2f,   1.0f, 0.0f
+    };
+
+    std::vector<GLuint> indices = {
+        0, 1, 2,
+        1, 2, 3,
+        4, 5, 6,
+        5, 6, 7,
+        8, 9, 10,
+        9, 10, 11,
+        12, 13, 14,
+        13, 14, 15,
+        16, 17, 18,
+        17, 18, 19,
+        20, 21, 22,
+        21, 22, 23
+    };
+
+
+    indicesCount = indices.size();
+
+    vao = std::make_unique<VertexArray>();
+    vbo = std::make_unique<VertexBuffer>(vertices.data(), vertices.size() * sizeof(GLfloat));
+
+    vao->AddBuffer(*vbo, { 3, 2 });
+
+    ebo = std::make_unique<ElementBuffer>(indices.data(), indicesCount);
+
+    vao->Bind();
+    ebo->Bind();
+    vao->Unbind();
+
+    shader->use();
+
+    texture = std::make_unique<Texture>("assets/pic.jpg");
+}
+
 
 // Handles events specific to this window
 void GameWindow::handleEvent(SDL_Event& e) {
@@ -64,6 +156,9 @@ void GameWindow::handleEvent(SDL_Event& e) {
         toggleFullscreen();
         spdlog::info("Toggled fullscreen mode");
     }
+
+    camera->processKeyboard(e, this);
+    camera->processMouseMotion(e);
 }
 
 // Brings the window into focus
@@ -98,8 +193,41 @@ void GameWindow::toggleFullscreen() {
     }
 }
 
+void GameWindow::update() {
+    camera->update();
+}
+
 void GameWindow::render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    shader->use();
+
+    {
+        glm::mat4 projection = glm::perspective(
+            glm::radians(45.0f), 
+            (float)mWidth / (float)mHeight,
+            0.1f, 
+            100.0f
+        );
+
+        camera->setViewToShader(shader->ID, "u_View");
+
+        glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Projection"), 1, GL_FALSE, &projection[0][0]);
+
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::scale(model, glm::vec3(16.0f, 9.0f, 5.0f));
+        glUniformMatrix4fv(glGetUniformLocation(shader->ID, "u_Model"), 1, GL_FALSE, &model[0][0]);
+    }
+
+    texture->bind(0); 
+    shader->setInt("texture1", 0);
+    vao->Bind();
+
+    glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
+
     SDL_GL_SwapWindow(mWindow);
 }
 

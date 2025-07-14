@@ -10,6 +10,7 @@ public:
     // Initializes a window
     bool init();
     bool initOpenGLContext();
+    void setupDraw();
 
     // Handles window events
     void handleEvent(SDL_Event& e);
@@ -23,6 +24,7 @@ public:
     // Toggle Fullscreen
     void toggleFullscreen();
 
+    void update();
     void render();
 
     // Getters

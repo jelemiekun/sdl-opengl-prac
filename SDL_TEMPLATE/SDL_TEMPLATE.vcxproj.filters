@@ -96,6 +96,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files\custom</Filter>
     </ClCompile>
+    <ClCompile Include="ProgramValues.cpp">
+      <Filter>Source Files\custom</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig">
@@ -167,6 +170,9 @@
       <Filter>Header Files\vendors\stb</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
+      <Filter>Header Files\custom</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgramValues.h">
       <Filter>Header Files\custom</Filter>
     </ClInclude>
   </ItemGroup>

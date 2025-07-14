@@ -5,6 +5,8 @@
 #include <string>
 #include <glad/glad.h>
 
+class GameWindow;
+
 class Camera {
 public:
     glm::vec3 position;
@@ -13,6 +15,7 @@ public:
     glm::vec3 right;
     glm::vec3 worldUp;
 
+    constexpr static float SPRINT_MULTIPLIER = 3.0f;
     float yaw;
     float pitch;
     float speed;
@@ -23,11 +26,13 @@ public:
 
     glm::mat4 getViewMatrix() const;
 
-    void processKeyboard(const Uint8* keystates);
+    void processKeyboard(SDL_Event& event, GameWindow* window);
 
-    void processMouseMotion(float xoffset, float yoffset);
+    void processMouseMotion(SDL_Event& event);
 
     void setViewToShader(GLuint shaderID, const std::string& uniformName) const;
+
+    void update();
 
 
 private:
