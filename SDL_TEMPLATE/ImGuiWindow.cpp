@@ -64,6 +64,46 @@ void ImGuiWindow::render() {
 
 	ImGui::ShowDemoWindow();
 
+	// Your GUI code
+	ImGui::Begin("Light Source");
+	ImGui::SeparatorText("Properties");
+
+	const char* childLabels[] = { "Translate", "Scale", "Rotate" };
+	const float LIGHT_SCALAR = 0.005f;
+
+	for (int i = 0; i < 3; i++) {
+		ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+
+		ImGui::PushID(i);
+		if (ImGui::TreeNode("", "%s", childLabels[i])) {
+			if (i == 0) {
+				ImGui::DragFloat("X value", &ProgramValues::LightSource::position.x, LIGHT_SCALAR);
+				ImGui::DragFloat("Y value", &ProgramValues::LightSource::position.y, LIGHT_SCALAR);
+				ImGui::DragFloat("Z value", &ProgramValues::LightSource::position.z, LIGHT_SCALAR);
+			}
+			if (i == 1) {
+				ImGui::DragFloat("X value", &ProgramValues::LightSource::scale.x, LIGHT_SCALAR);
+				ImGui::DragFloat("Y value", &ProgramValues::LightSource::scale.y, LIGHT_SCALAR);
+				ImGui::DragFloat("Z value", &ProgramValues::LightSource::scale.z, LIGHT_SCALAR);
+			}
+			if (i == 2) {
+				static ImGuiSliderFlags flags = ImGuiSliderFlags_None;
+				ImGui::DragInt("Degrees: ", &ProgramValues::LightSource::rotateDegrees, 1.0f, 1, 360, "%d", flags);
+				ImGui::DragFloat("X value", &ProgramValues::LightSource::rotate.x, LIGHT_SCALAR, 1.0f, 360.0f, "%.3f", flags);
+				ImGui::DragFloat("Y value", &ProgramValues::LightSource::rotate.y, LIGHT_SCALAR, 1.0f, 360.0f, "%.3f", flags);
+				ImGui::DragFloat("Z value", &ProgramValues::LightSource::rotate.z, LIGHT_SCALAR, 1.0f, 360.0f, "%.3f", flags);
+
+				if (ProgramValues::LightSource::rotate.x < 1.0f) ProgramValues::LightSource::rotate.x = 1.0f;
+				if (ProgramValues::LightSource::rotate.y < 1.0f) ProgramValues::LightSource::rotate.y = 1.0f;
+				if (ProgramValues::LightSource::rotate.z < 1.0f) ProgramValues::LightSource::rotate.z = 1.0f;
+			}
+			ImGui::TreePop();
+		}
+		ImGui::PopID();
+	}
+
+	ImGui::End();
+
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 

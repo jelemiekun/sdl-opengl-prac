@@ -1,14 +1,23 @@
 #include "ProgramValues.h"
 
 namespace ProgramValues {
-	bool isLockedIn = true;
-	bool isLockedInPressed = false;
-	bool moveForwardPressed = false;
-	bool moveBackwardPressed = false;
-	bool moveLeftPressed = false;
-	bool moveRightPressed = false;
-	bool moveUpPressed = false;
-	bool moveDownPressed = false;
-	bool sprinting = false;
-	bool fastZoom = false;
+	namespace KeyEvents {
+		bool isLockedIn = true;
+		bool isLockedInPressed = false;
+		bool moveForwardPressed = false;
+		bool moveBackwardPressed = false;
+		bool moveLeftPressed = false;
+		bool moveRightPressed = false;
+		bool moveUpPressed = false;
+		bool moveDownPressed = false;
+		bool sprinting = false;
+		bool fastZoom = false;
+	}
+
+	namespace LightSource {
+		glm::vec3 position = { 0.0f, 2.0f, 0.0f };
+		glm::vec3 scale = glm::vec3(1.0f);
+		glm::vec3 rotate = glm::vec3(1.0f);
+		int rotateDegrees = 0.0f;
+	}
 }

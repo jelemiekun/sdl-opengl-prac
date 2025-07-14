@@ -2,8 +2,8 @@
 #include <spdlog/spdlog.h>
 #include <glad/glad.h>
 #include "GameWindow.h"
-#include "ProgramValues.h"
 #include "ImGuiWindow.h"
+#include "imgui/imgui_impl_sdl2.h"
 
 Game::Game() : running(false), gameWindow(nullptr), imGuiWindow(nullptr) {}
 
@@ -77,7 +77,7 @@ void Game::initializeEverything() {
 void Game::input() {
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) running = false;
-
+        ImGui_ImplSDL2_ProcessEvent(&event);
         gameWindow->handleEvent(event);
     }
 }
@@ -88,7 +88,6 @@ void Game::update() {
 
 void Game::render() {
     gameWindow->render();
-    imGuiWindow->render();
 }
 
 const bool& Game::isRunning() const {

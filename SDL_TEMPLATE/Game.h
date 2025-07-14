@@ -21,8 +21,10 @@ public:
 private:
     bool running;
     GameWindow* gameWindow;
-    ImGuiWindow* imGuiWindow;
     SDL_Event event;
+
+public:
+    ImGuiWindow* imGuiWindow;
 
 private:
     void setOpenGLAttributes();

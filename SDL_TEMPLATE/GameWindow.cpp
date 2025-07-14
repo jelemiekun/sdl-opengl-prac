@@ -9,7 +9,10 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "Game.h"
+#include "ImGuiWindow.h"
 #include "ProgramValues.h"
+
+static Game* game = Game::getInstance();
 
 static constexpr int INITIAL_WIDTH = 1280;
 static constexpr int INITIAL_HEIGHT = 720;
@@ -147,12 +150,11 @@ void GameWindow::handleEvent(SDL_Event& e) {
                 break;
 
             case SDL_WINDOWEVENT_RESTORED:
-                ProgramValues::isLockedIn = true;
+                ProgramValues::KeyEvents::isLockedIn = true;
                 spdlog::info("Window {} restored", mWindowID);
                 break;
 
             case SDL_WINDOWEVENT_CLOSE:
-                Game* game = Game::getInstance();
                 game->setRunning(false);
                 SDL_HideWindow(mWindow);
                 mShown = false;
@@ -239,12 +241,13 @@ void GameWindow::render() {
         draw(model);
 
         glm::mat4 light = glm::mat4(1.0f);
-        light = glm::translate(light, glm::vec3(0.0f, 2.0f, 0.0f));
+        light = glm::translate(light, ProgramValues::LightSource::position);
+        light = glm::scale(light, ProgramValues::LightSource::scale);
+        light = glm::rotate(light, glm::radians(static_cast<float>(ProgramValues::LightSource::rotateDegrees)), ProgramValues::LightSource::rotate);
         draw(light);
     }
 
-
-
+    game->imGuiWindow->render();
     SDL_GL_SwapWindow(mWindow);
 }
 
