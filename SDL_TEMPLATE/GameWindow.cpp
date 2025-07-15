@@ -246,11 +246,13 @@ void GameWindow::render() {
     
     glm::mat4 objectModel = glm::mat4(1.0f);
     objectModel = glm::scale(objectModel, glm::vec3(16.0f, 9.0f, 5.0f));
+    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(objectModel)));
     
     shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
     shaderObject->setVec3("u_LightColor", ProgramValues::LightSource::color);
     shaderObject->setMat4("u_Projection", projection);
     shaderObject->setMat4("u_View", view);
+    shaderObject->setMat3("u_NormalMatrix", normalMatrix);
     shaderObject->setMat4("u_Model", objectModel);
 
     shaderObject->setVec3("u_LightPos", ProgramValues::LightSource::position);

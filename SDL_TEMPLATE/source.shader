@@ -4,6 +4,7 @@
 layout (location = 0) in vec3 L_coordinates;
 layout (location = 1) in vec3 L_normal;
 
+uniform mat3 u_NormalMatrix;
 uniform mat4 u_Model;
 uniform mat4 u_View;
 uniform mat4 u_Projection;
@@ -16,7 +17,7 @@ void main() {
 	pos = u_Projection * u_View * u_Model * pos;
 	gl_Position = pos;
 
-	Normal = mat3(transpose(inverse(u_Model))) * L_normal;
+	Normal = u_NormalMatrix * L_normal;
 	FragPos = vec3(u_Model * vec4(L_coordinates, 1.0f));
 }
 
