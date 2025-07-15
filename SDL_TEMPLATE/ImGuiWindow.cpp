@@ -89,6 +89,10 @@ void ImGuiWindow::render() {
 				ImGui::DragFloat("X value", &ProgramValues::LightSource::scale.x, LIGHT_SCALAR);
 				ImGui::DragFloat("Y value", &ProgramValues::LightSource::scale.y, LIGHT_SCALAR);
 				ImGui::DragFloat("Z value", &ProgramValues::LightSource::scale.z, LIGHT_SCALAR);
+
+				if (ProgramValues::LightSource::scale.x < 0.1f) ProgramValues::LightSource::scale.x = 0.1f;
+				if (ProgramValues::LightSource::scale.y < 0.1f) ProgramValues::LightSource::scale.y = 0.1f;
+				if (ProgramValues::LightSource::scale.z < 0.1f) ProgramValues::LightSource::scale.z = 0.1f;
 			}
 			if (i == 3) {
 				ImGui::DragInt("Degrees: ", &ProgramValues::LightSource::rotateDegrees, 1.0f, 1, 360, "%d", flags);

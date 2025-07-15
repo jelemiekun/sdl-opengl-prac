@@ -35,6 +35,7 @@ uniform vec3 u_ObjectColor;
 uniform vec3 u_LightColor;
 uniform float u_AmbientStrength;
 uniform vec3 u_LightPos;
+uniform vec3 u_CameraPos;
 
 void main(){
 	vec3 ambient = u_AmbientStrength * u_LightColor;
@@ -45,7 +46,15 @@ void main(){
 	float diff = max(dot(norm, lightDir), 0.0f);
 	vec3 diffuse = diff * u_LightColor;
 
-	vec3 finalColor = (diffuse + ambient) * u_ObjectColor;
+	vec3 viewDir = normalize(u_CameraPos - FragPos);
+	vec3 reflectDir = reflect(-lightDir, norm);
+
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+
+	float specularLength = 0.5;
+	vec3 specular = specularLength * spec * u_LightColor;
+
+	vec3 finalColor = (ambient + diffuse + specular) * u_ObjectColor;
 
 	FragColor = vec4(finalColor, 1.0f);
 }

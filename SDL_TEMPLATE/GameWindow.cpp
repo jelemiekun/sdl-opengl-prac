@@ -257,6 +257,7 @@ void GameWindow::render() {
 
     shaderObject->setVec3("u_LightPos", ProgramValues::LightSource::position);
     shaderObject->setFloat("u_AmbientStrength", ProgramValues::LightSource::ambientStrength);
+    shaderObject->setVec3("u_CameraPos", camera->position);
 
     drawModel(*shaderObject, objectModel);
 
