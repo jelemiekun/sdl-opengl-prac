@@ -16,6 +16,8 @@ namespace ProgramValues {
 	}
 
 	namespace LightSource {
+		extern float ambientStrength;
+		extern glm::vec3 color;
 		extern glm::vec3 position;
 		extern glm::vec3 scale;
 		extern glm::vec3 rotate;

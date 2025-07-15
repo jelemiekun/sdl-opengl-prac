@@ -64,30 +64,33 @@ void ImGuiWindow::render() {
 
 	ImGui::ShowDemoWindow();
 
-	// Your GUI code
 	ImGui::Begin("Light Source");
 	ImGui::SeparatorText("Properties");
 
-	const char* childLabels[] = { "Translate", "Scale", "Rotate" };
+	const char* childLabels[] = {"Light", "Translate", "Scale", "Rotate" };
 	const float LIGHT_SCALAR = 0.005f;
 
-	for (int i = 0; i < 3; i++) {
+	for (int i = 0; i < 4; i++) {
+		static ImGuiSliderFlags flags = ImGuiSliderFlags_None;
 		ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 
 		ImGui::PushID(i);
 		if (ImGui::TreeNode("", "%s", childLabels[i])) {
 			if (i == 0) {
+				ImGui::DragFloat("Ambient Strength", &ProgramValues::LightSource::ambientStrength, LIGHT_SCALAR, 0.0f, 1.0f, "%.3f", flags);
+				ImGui::ColorEdit3("Color", (float*)&ProgramValues::LightSource::color);
+			}
+			if (i == 1) {
 				ImGui::DragFloat("X value", &ProgramValues::LightSource::position.x, LIGHT_SCALAR);
 				ImGui::DragFloat("Y value", &ProgramValues::LightSource::position.y, LIGHT_SCALAR);
 				ImGui::DragFloat("Z value", &ProgramValues::LightSource::position.z, LIGHT_SCALAR);
 			}
-			if (i == 1) {
+			if (i == 2) {
 				ImGui::DragFloat("X value", &ProgramValues::LightSource::scale.x, LIGHT_SCALAR);
 				ImGui::DragFloat("Y value", &ProgramValues::LightSource::scale.y, LIGHT_SCALAR);
 				ImGui::DragFloat("Z value", &ProgramValues::LightSource::scale.z, LIGHT_SCALAR);
 			}
-			if (i == 2) {
-				static ImGuiSliderFlags flags = ImGuiSliderFlags_None;
+			if (i == 3) {
 				ImGui::DragInt("Degrees: ", &ProgramValues::LightSource::rotateDegrees, 1.0f, 1, 360, "%d", flags);
 				ImGui::DragFloat("X value", &ProgramValues::LightSource::rotate.x, LIGHT_SCALAR, 1.0f, 360.0f, "%.3f", flags);
 				ImGui::DragFloat("Y value", &ProgramValues::LightSource::rotate.y, LIGHT_SCALAR, 1.0f, 360.0f, "%.3f", flags);

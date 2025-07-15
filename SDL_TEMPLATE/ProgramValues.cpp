@@ -15,6 +15,8 @@ namespace ProgramValues {
 	}
 
 	namespace LightSource {
+		float ambientStrength = 0.1;
+		glm::vec3 color = glm::vec3(1.0f);
 		glm::vec3 position = { 0.0f, 2.0f, 0.0f };
 		glm::vec3 scale = glm::vec3(1.0f);
 		glm::vec3 rotate = glm::vec3(1.0f);

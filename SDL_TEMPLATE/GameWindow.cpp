@@ -66,35 +66,36 @@ void GameWindow::setupDraw() {
     shaderObject = std::make_unique<Shader>("source.shader");
 
     std::vector<GLfloat> vertices = {
-            -0.2f,  0.11f,  0.2f, //  0.0f, 1.0f,
-             0.2f,  0.11f,  0.2f, //  1.0f, 1.0f,
-            -0.2f, -0.11f,  0.2f, //  0.0f, 0.0f,
-             0.2f, -0.11f,  0.2f, //  1.0f, 0.0f,
+        // Position                Normal       Picture Coordinates
+            -0.2f,  0.11f,  0.2f, 0.0f,  0.0f, 1.0f, //  0.0f, 1.0f,
+             0.2f,  0.11f,  0.2f, 0.0f,  0.0f, 1.0f, //  1.0f, 1.0f,
+            -0.2f, -0.11f,  0.2f, 0.0f,  0.0f, 1.0f, //  0.0f, 0.0f,
+             0.2f, -0.11f,  0.2f, 0.0f,  0.0f, 1.0f, //  1.0f, 0.0f,
 
-             -0.2f,  0.11f, -0.2f, //  0.0f, 1.0f,
-              0.2f,  0.11f, -0.2f, //  1.0f, 1.0f,
-             -0.2f, -0.11f, -0.2f, //  0.0f, 0.0f,
-              0.2f, -0.11f, -0.2f, //  1.0f, 0.0f,
+             -0.2f,  0.11f, -0.2f, 0.0f,  0.0f, -1.0f, //  0.0f, 1.0f,
+              0.2f,  0.11f, -0.2f, 0.0f,  0.0f, -1.0f, //  1.0f, 1.0f,
+             -0.2f, -0.11f, -0.2f, 0.0f,  0.0f, -1.0f, //  0.0f, 0.0f,
+              0.2f, -0.11f, -0.2f, 0.0f,  0.0f, -1.0f, //  1.0f, 0.0f,
               
-              -0.2f,  0.11f, -0.2f, //  0.0f, 1.0f,
-              -0.2f,  0.11f,  0.2f, //  1.0f, 1.0f,
-              -0.2f, -0.11f, -0.2f, //  0.0f, 0.0f,
-              -0.2f, -0.11f,  0.2f, //  1.0f, 0.0f,
+              -0.2f,  0.11f, -0.2f, -1.0f,  0.0f,  0.0f, //  0.0f, 1.0f,
+              -0.2f,  0.11f,  0.2f, -1.0f,  0.0f,  0.0f, //  1.0f, 1.0f,
+              -0.2f, -0.11f, -0.2f, -1.0f,  0.0f,  0.0f, //  0.0f, 0.0f,
+              -0.2f, -0.11f,  0.2f, -1.0f,  0.0f,  0.0f, //  1.0f, 0.0f,
 
-               0.2f,  0.11f,  0.2f, //  0.0f, 1.0f,
-               0.2f,  0.11f, -0.2f, //  1.0f, 1.0f,
-               0.2f, -0.11f,  0.2f, //  0.0f, 0.0f,
-               0.2f, -0.11f, -0.2f, //  1.0f, 0.0f,
+               0.2f,  0.11f,  0.2f, 1.0f,  0.0f,  0.0f, //  0.0f, 1.0f,
+               0.2f,  0.11f, -0.2f, 1.0f,  0.0f,  0.0f, //  1.0f, 1.0f,
+               0.2f, -0.11f,  0.2f, 1.0f,  0.0f,  0.0f, //  0.0f, 0.0f,
+               0.2f, -0.11f, -0.2f, 1.0f,  0.0f,  0.0f, //  1.0f, 0.0f,
 
-               -0.2f,  0.11f, -0.2f, //  0.0f, 1.0f,
-                0.2f,  0.11f, -0.2f, //  1.0f, 1.0f,
-               -0.2f,  0.11f,  0.2f, //  0.0f, 0.0f,
-                0.2f,  0.11f,  0.2f, //  1.0f, 0.0f,
+               -0.2f,  0.11f, -0.2f, 0.0f, 1.0f,  0.0f, //  0.0f, 1.0f,
+                0.2f,  0.11f, -0.2f, 0.0f, 1.0f,  0.0f, //  1.0f, 1.0f,
+               -0.2f,  0.11f,  0.2f, 0.0f, 1.0f,  0.0f, //  0.0f, 0.0f,
+                0.2f,  0.11f,  0.2f, 0.0f, 1.0f,  0.0f, //  1.0f, 0.0f,
 
-                -0.2f, -0.11f,  0.2f, //  0.0f, 1.0f,
-                 0.2f, -0.11f,  0.2f, //  1.0f, 1.0f,
-                -0.2f, -0.11f, -0.2f, //  0.0f, 0.0f,
-                 0.2f, -0.11f, -0.2f//,   1.0f, 0.0f
+                -0.2f, -0.11f,  0.2f, 0.0f,  -1.0f,  0.0f, //  0.0f, 1.0f,
+                 0.2f, -0.11f,  0.2f, 0.0f,  -1.0f,  0.0f, //  1.0f, 1.0f,
+                -0.2f, -0.11f, -0.2f, 0.0f,  -1.0f,  0.0f, //  0.0f, 0.0f,
+                 0.2f, -0.11f, -0.2f, 0.0f,  -1.0f,  0.0f  //,   1.0f, 0.0f
     };
 
     std::vector<GLuint> indices = {
@@ -118,7 +119,7 @@ void GameWindow::setupDraw() {
     vaoObject = std::make_unique<VertexArray>();
     vbo = std::make_unique<VertexBuffer>(vertices.data(), vertices.size() * sizeof(GLfloat));
 
-    vaoObject->AddBuffer(*vbo, { 3 });
+    vaoObject->AddBuffer(*vbo, { 3 , 3 });
 
     ebo = std::make_unique<ElementBuffer>(indices.data(), indicesCount);
 
@@ -131,7 +132,7 @@ void GameWindow::setupDraw() {
     vaoLight = std::make_unique<VertexArray>();
     vaoLight->Bind();
     ebo->Bind();
-    vaoLight->AddBuffer(*vbo, { 3 });
+    vaoLight->AddBuffer(*vbo, { 3 , 3 });
 
 
     texture = std::make_unique<Texture>("assets/pic.jpg");
@@ -247,10 +248,13 @@ void GameWindow::render() {
     objectModel = glm::scale(objectModel, glm::vec3(16.0f, 9.0f, 5.0f));
     
     shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-    shaderObject->setVec3("u_LightColor", glm::vec3(1.0f));
+    shaderObject->setVec3("u_LightColor", ProgramValues::LightSource::color);
     shaderObject->setMat4("u_Projection", projection);
     shaderObject->setMat4("u_View", view);
     shaderObject->setMat4("u_Model", objectModel);
+
+    shaderObject->setVec3("u_LightPos", ProgramValues::LightSource::position);
+    shaderObject->setFloat("u_AmbientStrength", ProgramValues::LightSource::ambientStrength);
 
     drawModel(*shaderObject, objectModel);
 
