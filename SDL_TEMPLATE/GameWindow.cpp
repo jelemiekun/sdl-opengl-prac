@@ -249,15 +249,25 @@ void GameWindow::render() {
     glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(objectModel)));
     
     shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-    shaderObject->setVec3("u_LightColor", ProgramValues::LightSource::color);
+
     shaderObject->setMat4("u_Projection", projection);
     shaderObject->setMat4("u_View", view);
-    shaderObject->setMat3("u_NormalMatrix", normalMatrix);
     shaderObject->setMat4("u_Model", objectModel);
+    shaderObject->setMat3("u_NormalMatrix", normalMatrix);
 
-    shaderObject->setVec3("u_LightPos", ProgramValues::LightSource::position);
-    shaderObject->setFloat("u_AmbientStrength", ProgramValues::LightSource::ambientStrength);
+    shaderObject->setVec3("light.position", ProgramValues::LightSource::position);
+    shaderObject->setVec3("light.ambient", ProgramValues::LightSource::ambient);
+    shaderObject->setVec3("light.diffuse", ProgramValues::LightSource::diffuse);
+    shaderObject->setVec3("light.specular", ProgramValues::LightSource::specular);
+
+
     shaderObject->setVec3("u_CameraPos", camera->position);
+
+    shaderObject->setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+    shaderObject->setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+    shaderObject->setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+
+    shaderObject->setFloat("material.shininess", ProgramValues::Object::shininess);
 
     drawModel(*shaderObject, objectModel);
 

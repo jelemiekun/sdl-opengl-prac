@@ -67,25 +67,52 @@ void ImGuiWindow::render() {
 	ImGui::Begin("Light Source");
 	ImGui::SeparatorText("Properties");
 
-	const char* childLabels[] = {"Light", "Translate", "Scale", "Rotate" };
+	const char* childLabels[] = {"Shininess", "Ambient", "Diffuse", "Specular", "Translate", "Scale", "Rotate" };
+	const int numLabels = sizeof(childLabels) / sizeof(childLabels[0]);
 	const float LIGHT_SCALAR = 0.005f;
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < numLabels; i++) {
 		static ImGuiSliderFlags flags = ImGuiSliderFlags_None;
 		ImGui::SetNextItemOpen(true, ImGuiCond_Once);
 
 		ImGui::PushID(i);
 		if (ImGui::TreeNode("", "%s", childLabels[i])) {
 			if (i == 0) {
-				ImGui::DragFloat("Ambient Strength", &ProgramValues::LightSource::ambientStrength, LIGHT_SCALAR, 0.0f, 1.0f, "%.3f", flags);
-				ImGui::ColorEdit3("Color", (float*)&ProgramValues::LightSource::color);
+				ImGui::DragInt("Shininess", &ProgramValues::Object::shininess, LIGHT_SCALAR, 1, 256, "%d", flags);
 			}
 			if (i == 1) {
+				ImGui::DragFloat("X value", &ProgramValues::LightSource::ambient.x, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
+				ImGui::DragFloat("Y value", &ProgramValues::LightSource::ambient.y, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
+				ImGui::DragFloat("Z value", &ProgramValues::LightSource::ambient.z, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
+
+				if (ProgramValues::LightSource::ambient.x < 0.1f) ProgramValues::LightSource::ambient.x = 0.1f;
+				if (ProgramValues::LightSource::ambient.y < 0.1f) ProgramValues::LightSource::ambient.y = 0.1f;
+				if (ProgramValues::LightSource::ambient.z < 0.1f) ProgramValues::LightSource::ambient.z = 0.1f;
+			}
+			if (i == 2) {
+				ImGui::DragFloat("X value", &ProgramValues::LightSource::diffuse.x, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
+				ImGui::DragFloat("Y value", &ProgramValues::LightSource::diffuse.y, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
+				ImGui::DragFloat("Z value", &ProgramValues::LightSource::diffuse.z, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
+
+				if (ProgramValues::LightSource::diffuse.x < 0.1f) ProgramValues::LightSource::diffuse.x = 0.1f;
+				if (ProgramValues::LightSource::diffuse.y < 0.1f) ProgramValues::LightSource::diffuse.y = 0.1f;
+				if (ProgramValues::LightSource::diffuse.z < 0.1f) ProgramValues::LightSource::diffuse.z = 0.1f;
+			}
+			if (i == 3) {
+				ImGui::DragFloat("X value", &ProgramValues::LightSource::specular.x, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
+				ImGui::DragFloat("Y value", &ProgramValues::LightSource::specular.y, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
+				ImGui::DragFloat("Z value", &ProgramValues::LightSource::specular.z, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
+
+				if (ProgramValues::LightSource::specular.x < 0.1f) ProgramValues::LightSource::specular.x = 0.1f;
+				if (ProgramValues::LightSource::specular.y < 0.1f) ProgramValues::LightSource::specular.y = 0.1f;
+				if (ProgramValues::LightSource::specular.z < 0.1f) ProgramValues::LightSource::specular.z = 0.1f;
+			}
+			if (i == 4) {
 				ImGui::DragFloat("X value", &ProgramValues::LightSource::position.x, LIGHT_SCALAR);
 				ImGui::DragFloat("Y value", &ProgramValues::LightSource::position.y, LIGHT_SCALAR);
 				ImGui::DragFloat("Z value", &ProgramValues::LightSource::position.z, LIGHT_SCALAR);
 			}
-			if (i == 2) {
+			if (i == 5) {
 				ImGui::DragFloat("X value", &ProgramValues::LightSource::scale.x, LIGHT_SCALAR);
 				ImGui::DragFloat("Y value", &ProgramValues::LightSource::scale.y, LIGHT_SCALAR);
 				ImGui::DragFloat("Z value", &ProgramValues::LightSource::scale.z, LIGHT_SCALAR);
@@ -94,7 +121,7 @@ void ImGuiWindow::render() {
 				if (ProgramValues::LightSource::scale.y < 0.1f) ProgramValues::LightSource::scale.y = 0.1f;
 				if (ProgramValues::LightSource::scale.z < 0.1f) ProgramValues::LightSource::scale.z = 0.1f;
 			}
-			if (i == 3) {
+			if (i == 6) {
 				ImGui::DragInt("Degrees: ", &ProgramValues::LightSource::rotateDegrees, 1.0f, 1, 360, "%d", flags);
 				ImGui::DragFloat("X value", &ProgramValues::LightSource::rotate.x, LIGHT_SCALAR, 1.0f, 360.0f, "%.3f", flags);
 				ImGui::DragFloat("Y value", &ProgramValues::LightSource::rotate.y, LIGHT_SCALAR, 1.0f, 360.0f, "%.3f", flags);

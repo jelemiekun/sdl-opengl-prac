@@ -99,6 +99,9 @@
     <ClCompile Include="ProgramValues.cpp">
       <Filter>Source Files\custom</Filter>
     </ClCompile>
+    <ClCompile Include="ImGuiWindow.cpp">
+      <Filter>Source Files\custom</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig">
@@ -110,6 +113,7 @@
     <None Include="source.shader">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="light.shader" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">
@@ -173,6 +177,9 @@
       <Filter>Header Files\custom</Filter>
     </ClInclude>
     <ClInclude Include="ProgramValues.h">
+      <Filter>Header Files\custom</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiWindow.h">
       <Filter>Header Files\custom</Filter>
     </ClInclude>
   </ItemGroup>
