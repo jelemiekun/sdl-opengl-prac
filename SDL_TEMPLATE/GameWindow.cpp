@@ -17,17 +17,21 @@ static Game* game = Game::getInstance();
 static constexpr int INITIAL_WIDTH = 1280;
 static constexpr int INITIAL_HEIGHT = 720;
 
-static int indicesCount;
-static std::unique_ptr<Texture> texture;
-static std::unique_ptr<VertexBuffer> vbo;
-static std::unique_ptr<ElementBuffer> ebo;
+static std::unique_ptr<Texture> textureObjectDiffuse;
+static std::unique_ptr<Texture> textureObjectSpecular;
 static std::unique_ptr<Camera> camera;
 
+static int indicesCountObject;
 static std::unique_ptr<Shader> shaderObject;
 static std::unique_ptr<VertexArray> vaoObject;
+static std::unique_ptr<VertexBuffer> vboObject;
+static std::unique_ptr<ElementBuffer> eboObject;
 
+static int indicesCountLight;
 static std::unique_ptr<Shader> shaderLight;
 static std::unique_ptr<VertexArray> vaoLight;
+static std::unique_ptr<VertexBuffer> vboLight;
+static std::unique_ptr<ElementBuffer> eboLight;
 
 // Constructor
 GameWindow::GameWindow()
@@ -65,40 +69,40 @@ void GameWindow::setupDraw() {
 
     shaderObject = std::make_unique<Shader>("source.shader");
 
-    std::vector<GLfloat> vertices = {
+    std::vector<GLfloat> verticesObject = {
         // Position                Normal       Picture Coordinates
-            -0.2f,  0.11f,  0.2f, 0.0f,  0.0f, 1.0f, //  0.0f, 1.0f,
-             0.2f,  0.11f,  0.2f, 0.0f,  0.0f, 1.0f, //  1.0f, 1.0f,
-            -0.2f, -0.11f,  0.2f, 0.0f,  0.0f, 1.0f, //  0.0f, 0.0f,
-             0.2f, -0.11f,  0.2f, 0.0f,  0.0f, 1.0f, //  1.0f, 0.0f,
+            -0.2f,  0.11f,  0.2f, 0.0f,  0.0f, 1.0f,  0.0f, 1.0f,
+             0.2f,  0.11f,  0.2f, 0.0f,  0.0f, 1.0f,  1.0f, 1.0f,
+            -0.2f, -0.11f,  0.2f, 0.0f,  0.0f, 1.0f,  0.0f, 0.0f,
+             0.2f, -0.11f,  0.2f, 0.0f,  0.0f, 1.0f,  1.0f, 0.0f,
 
-             -0.2f,  0.11f, -0.2f, 0.0f,  0.0f, -1.0f, //  0.0f, 1.0f,
-              0.2f,  0.11f, -0.2f, 0.0f,  0.0f, -1.0f, //  1.0f, 1.0f,
-             -0.2f, -0.11f, -0.2f, 0.0f,  0.0f, -1.0f, //  0.0f, 0.0f,
-              0.2f, -0.11f, -0.2f, 0.0f,  0.0f, -1.0f, //  1.0f, 0.0f,
+             -0.2f,  0.11f, -0.2f, 0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+              0.2f,  0.11f, -0.2f, 0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+             -0.2f, -0.11f, -0.2f, 0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+              0.2f, -0.11f, -0.2f, 0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
               
-              -0.2f,  0.11f, -0.2f, -1.0f,  0.0f,  0.0f, //  0.0f, 1.0f,
-              -0.2f,  0.11f,  0.2f, -1.0f,  0.0f,  0.0f, //  1.0f, 1.0f,
-              -0.2f, -0.11f, -0.2f, -1.0f,  0.0f,  0.0f, //  0.0f, 0.0f,
-              -0.2f, -0.11f,  0.2f, -1.0f,  0.0f,  0.0f, //  1.0f, 0.0f,
+              -0.2f,  0.11f, -0.2f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+              -0.2f,  0.11f,  0.2f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+              -0.2f, -0.11f, -0.2f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+              -0.2f, -0.11f,  0.2f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-               0.2f,  0.11f,  0.2f, 1.0f,  0.0f,  0.0f, //  0.0f, 1.0f,
-               0.2f,  0.11f, -0.2f, 1.0f,  0.0f,  0.0f, //  1.0f, 1.0f,
-               0.2f, -0.11f,  0.2f, 1.0f,  0.0f,  0.0f, //  0.0f, 0.0f,
-               0.2f, -0.11f, -0.2f, 1.0f,  0.0f,  0.0f, //  1.0f, 0.0f,
+               0.2f,  0.11f,  0.2f, 1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+               0.2f,  0.11f, -0.2f, 1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+               0.2f, -0.11f,  0.2f, 1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+               0.2f, -0.11f, -0.2f, 1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-               -0.2f,  0.11f, -0.2f, 0.0f, 1.0f,  0.0f, //  0.0f, 1.0f,
-                0.2f,  0.11f, -0.2f, 0.0f, 1.0f,  0.0f, //  1.0f, 1.0f,
-               -0.2f,  0.11f,  0.2f, 0.0f, 1.0f,  0.0f, //  0.0f, 0.0f,
-                0.2f,  0.11f,  0.2f, 0.0f, 1.0f,  0.0f, //  1.0f, 0.0f,
+               -0.2f,  0.11f, -0.2f, 0.0f, 1.0f,  0.0f,  0.0f, 1.0f,
+                0.2f,  0.11f, -0.2f, 0.0f, 1.0f,  0.0f,  1.0f, 1.0f,
+               -0.2f,  0.11f,  0.2f, 0.0f, 1.0f,  0.0f,  0.0f, 0.0f,
+                0.2f,  0.11f,  0.2f, 0.0f, 1.0f,  0.0f,  1.0f, 0.0f,
 
-                -0.2f, -0.11f,  0.2f, 0.0f,  -1.0f,  0.0f, //  0.0f, 1.0f,
-                 0.2f, -0.11f,  0.2f, 0.0f,  -1.0f,  0.0f, //  1.0f, 1.0f,
-                -0.2f, -0.11f, -0.2f, 0.0f,  -1.0f,  0.0f, //  0.0f, 0.0f,
-                 0.2f, -0.11f, -0.2f, 0.0f,  -1.0f,  0.0f  //,   1.0f, 0.0f
+                -0.2f, -0.11f,  0.2f, 0.0f,  -1.0f,  0.0f,  0.0f, 1.0f,
+                 0.2f, -0.11f,  0.2f, 0.0f,  -1.0f,  0.0f,  1.0f, 1.0f,
+                -0.2f, -0.11f, -0.2f, 0.0f,  -1.0f,  0.0f,  0.0f, 0.0f,
+                 0.2f, -0.11f, -0.2f, 0.0f,  -1.0f,  0.0f,  1.0f, 0.0f
     };
 
-    std::vector<GLuint> indices = {
+    std::vector<GLuint> indicesObject = {
         0, 1, 2,
         1, 2, 3,
         4, 5, 6,
@@ -114,28 +118,64 @@ void GameWindow::setupDraw() {
     };
 
 
-    indicesCount = indices.size();
+    indicesCountObject = indicesObject.size();
 
     vaoObject = std::make_unique<VertexArray>();
-    vbo = std::make_unique<VertexBuffer>(vertices.data(), vertices.size() * sizeof(GLfloat));
+    vboObject = std::make_unique<VertexBuffer>(verticesObject.data(), verticesObject.size() * sizeof(GLfloat));
 
-    vaoObject->AddBuffer(*vbo, { 3 , 3 });
+    vaoObject->AddBuffer(*vboObject, { 3 , 3 , 2 });
 
-    ebo = std::make_unique<ElementBuffer>(indices.data(), indicesCount);
+    eboObject = std::make_unique<ElementBuffer>(indicesObject.data(), indicesCountObject);
 
     vaoObject->Bind();
-    ebo->Bind();
+    eboObject->Bind();
     vaoObject->Unbind();
 
     shaderLight = std::make_unique<Shader>("light.shader");
-    
+
+    std::vector<GLfloat> verticesLight = {
+        // Position                Normal
+            -0.2f,  0.2f,  0.2f,
+             0.2f,  0.2f,  0.2f,
+            -0.2f, -0.2f,  0.2f,
+             0.2f, -0.2f,  0.2f,
+
+             -0.2f,  0.2f, -0.2f,
+              0.2f,  0.2f, -0.2f,
+             -0.2f, -0.2f, -0.2f,
+              0.2f, -0.2f, -0.2f
+    };
+
+    std::vector<GLuint> indicesLight = {
+        0, 1, 2,
+        1, 2, 3,
+        4, 5, 6,
+        5, 6, 7,
+        0, 4, 1,
+        4, 1, 5,
+        2, 6, 3,
+        6, 3, 7,
+        0, 4, 2,
+        4, 2, 6,
+        1, 5, 3,
+        5, 3, 7
+    };
+
+    indicesCountLight = indicesLight.size();
+
     vaoLight = std::make_unique<VertexArray>();
+    vboLight = std::make_unique<VertexBuffer>(verticesLight.data(), verticesLight.size() * sizeof(GLfloat));
+    
+    vaoLight->AddBuffer(*vboLight, { 3 });
+
+    eboLight = std::make_unique<ElementBuffer>(indicesLight.data(), indicesCountLight);
+
     vaoLight->Bind();
-    ebo->Bind();
-    vaoLight->AddBuffer(*vbo, { 3 , 3 });
+    eboLight->Bind();
+    vboLight->Unbind();
 
-
-    texture = std::make_unique<Texture>("assets/pic.jpg");
+    textureObjectDiffuse = std::make_unique<Texture>("assets/container2.png");
+    textureObjectSpecular = std::make_unique<Texture>("assets/container2_specular.png");
 }
 
 
@@ -233,22 +273,25 @@ void GameWindow::render() {
     );
     glm::mat4 view = camera->getViewMatrix();
 
-    auto drawModel = [this](Shader& shader, glm::mat4& model) -> void {
+    auto drawModel = [](Shader& shader, glm::mat4& model, int indicesCount) -> void {
         shader.setMat4("u_Model", model);
         glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
     };
 
-    // texture->bind(0); 
-    // shaderObject->setInt("texture1", 0);
+    textureObjectDiffuse->bind(0);
+    shaderObject->setInt("material.diffuse", 0);
+
+    textureObjectSpecular->bind(1);
+    shaderObject->setInt("material.specular", 1);
 
     shaderObject->use();
     vaoObject->Bind();
     
     glm::mat4 objectModel = glm::mat4(1.0f);
-    objectModel = glm::scale(objectModel, glm::vec3(16.0f, 9.0f, 5.0f));
+    objectModel = glm::scale(objectModel, glm::vec3(5.0f, 5.0f, 5.0f));
     glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(objectModel)));
     
-    shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+    // shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
 
     shaderObject->setMat4("u_Projection", projection);
     shaderObject->setMat4("u_View", view);
@@ -263,13 +306,13 @@ void GameWindow::render() {
 
     shaderObject->setVec3("u_CameraPos", camera->position);
 
-    shaderObject->setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+    // shaderObject->setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
     shaderObject->setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
     shaderObject->setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
 
     shaderObject->setFloat("material.shininess", ProgramValues::Object::shininess);
 
-    drawModel(*shaderObject, objectModel);
+    drawModel(*shaderObject, objectModel, indicesCountObject);
 
     
     shaderLight->use();
@@ -287,7 +330,7 @@ void GameWindow::render() {
     shaderLight->setMat4("u_View", view);
     shaderLight->setMat4("u_Model", lightModel);
 
-    drawModel(*shaderLight, lightModel);
+    drawModel(*shaderLight, lightModel, indicesCountLight);
 
 
     game->imGuiWindow->render();
