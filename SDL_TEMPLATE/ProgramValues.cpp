@@ -26,6 +26,20 @@ namespace ProgramValues {
 	}
 
 	namespace Object {
-		int shininess = 1.0f;
+		int count = 1;
+		float spacing = 1.0f;
+		bool revolve = false;
+		float revolveSpeed = 0.00005f;
+		int shininess = 1;
+		glm::vec3 ambient = glm::vec3(0.2f);
+		glm::vec3 diffuse = glm::vec3(0.5f);
+		glm::vec3 specular = glm::vec3(1.0f);
+		glm::vec3 color = glm::vec3(1.0f);
+		glm::vec3 position = glm::vec3(1.0f);
+		glm::vec3 scale = glm::vec3(1.0f);
+		bool autoRotate = false;
+		float autoRotateSpeed = 0.0005f;
+		glm::vec3 rotate = glm::vec3(1.0f);
+		float rotateDegrees = 0.0f;
 	}
 }

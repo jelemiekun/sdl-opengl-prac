@@ -11,6 +11,7 @@
 #include "Game.h"
 #include "ImGuiWindow.h"
 #include "ProgramValues.h"
+#include "MultipleObjectHandler.h"
 
 static Game* game = Game::getInstance();
 
@@ -243,17 +244,57 @@ void GameWindow::render() {
 
     shaderObject->use();
     vaoObject->Bind();
-    
-    glm::mat4 objectModel = glm::mat4(1.0f);
-    objectModel = glm::scale(objectModel, glm::vec3(16.0f, 9.0f, 5.0f));
-    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(objectModel)));
-    
-    shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
 
-    shaderObject->setMat4("u_Projection", projection);
-    shaderObject->setMat4("u_View", view);
-    shaderObject->setMat4("u_Model", objectModel);
-    shaderObject->setMat3("u_NormalMatrix", normalMatrix);
+    for (int index = 0; index < ProgramValues::Object::count; index++) {
+        glm::mat4 objectModel = glm::mat4(1.0f);
+        objectModel = glm::scale(objectModel, glm::vec3(4.5f, 4.5f, 2.5f));
+
+        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(objectModel)));
+
+        //****
+        ProgramValues::Object::position = glm::vec3(1.0f);
+        ProgramValues::Object::position = MultipleObjectHandler::obtainPosition(index, ProgramValues::Object::spacing);
+
+        if (ProgramValues::Object::revolve) {
+            static float totalAngle = 0.0f;
+            totalAngle += ProgramValues::Object::revolveSpeed;
+
+            ProgramValues::Object::position = MultipleObjectHandler::revolve(ProgramValues::Object::position, totalAngle);
+        }
+
+        if (ProgramValues::Object::autoRotate) {
+            ProgramValues::Object::rotateDegrees += (1 * ProgramValues::Object::autoRotateSpeed);
+
+            if (ProgramValues::Object::rotateDegrees > 360)
+                ProgramValues::Object::rotateDegrees = 1;
+        }
+
+        objectModel = glm::rotate(objectModel, glm::radians(ProgramValues::Object::rotateDegrees), ProgramValues::Object::rotate);
+        
+        //****
+        objectModel = glm::translate(objectModel, ProgramValues::Object::position);
+        objectModel = glm::scale(objectModel, ProgramValues::Object::scale);
+
+        shaderObject->setMat4("u_Projection", projection);
+        shaderObject->setMat4("u_View", view);
+        shaderObject->setMat4("u_Model", objectModel);
+        shaderObject->setMat3("u_NormalMatrix", normalMatrix);
+
+        shaderObject->setVec3("u_CameraPos", camera->position);
+        
+        drawModel(*shaderObject, objectModel);
+    }
+
+
+    shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+    
+    shaderObject->setFloat("material.shininess", ProgramValues::Object::shininess);
+    shaderObject->setVec3("material.ambient", ProgramValues::Object::ambient);
+    shaderObject->setVec3("material.diffuse", ProgramValues::Object::diffuse);
+    shaderObject->setVec3("material.specular", ProgramValues::Object::specular);
+
+
+
 
     shaderObject->setVec3("light.position", ProgramValues::LightSource::position);
     shaderObject->setVec3("light.ambient", ProgramValues::LightSource::ambient);
@@ -261,15 +302,7 @@ void GameWindow::render() {
     shaderObject->setVec3("light.specular", ProgramValues::LightSource::specular);
 
 
-    shaderObject->setVec3("u_CameraPos", camera->position);
 
-    shaderObject->setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-    shaderObject->setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
-    shaderObject->setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-
-    shaderObject->setFloat("material.shininess", ProgramValues::Object::shininess);
-
-    drawModel(*shaderObject, objectModel);
 
     
     shaderLight->use();
