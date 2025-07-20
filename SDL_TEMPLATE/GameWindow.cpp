@@ -274,9 +274,9 @@ void GameWindow::render() {
         shaderObject->setMat4("u_Projection", projection);
         shaderObject->setVec3("u_CameraPos", camera->position);
 
-        shaderObject->setVec3("material.ambient", glm::vec3(obj->ambient));
-        shaderObject->setVec3("material.diffuse", glm::vec3(obj->diffuse));
-        shaderObject->setVec3("material.specular", glm::vec3(obj->specular));
+        // shaderObject->setVec3("material.ambientStrength", glm::vec3(obj->ambient));
+        // shaderObject->setVec3("material.diffuseStrength", glm::vec3(obj->diffuse));
+        // shaderObject->setVec3("material.specularStrength", glm::vec3(obj->specular));
         shaderObject->setFloat("material.shininess", obj->shininess);
 
         shaderObject->setVec3("light.ambient", glm::vec3(ProgramValues::Lights::light0->ambient));
