@@ -65,67 +65,132 @@ void ImGuiWindow::render() {
 
 	ImGui::ShowDemoWindow();
 
-	ImGui::Begin("Object Properties");
+	{
+		ImGui::Begin("Object Properties");
 
-	const char* items[] = { "pic.jpg", "container2.png" };
-	static int item_selected_idx = 0; // Here we store our selection data as an index.
+		const char* items[] = { "pic.jpg", "container2.png" };
+		static int item_selected_idx = 0; // Here we store our selection data as an index.
 
-	// Pass in the preview value visible before opening the combo (it could technically be different contents or not pulled from items[])
-	const char* combo_preview_value = items[item_selected_idx];
+		// Pass in the preview value visible before opening the combo (it could technically be different contents or not pulled from items[])
+		const char* combo_preview_value = items[item_selected_idx];
 
-	if (ImGui::BeginCombo("Object", combo_preview_value, flags)) {
-		for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
-			const bool is_selected = (item_selected_idx == n);
-			if (ImGui::Selectable(items[n], is_selected))
-				item_selected_idx = n;
+		if (ImGui::BeginCombo("Object", combo_preview_value, flags)) {
+			for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
+				const bool is_selected = (item_selected_idx == n);
+				if (ImGui::Selectable(items[n], is_selected))
+					item_selected_idx = n;
 
-			// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-			if (is_selected)
-				ImGui::SetItemDefaultFocus();
+				// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+				if (is_selected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
 		}
-		ImGui::EndCombo();
+
+		ProgramValues::Object* objectReference{};
+
+		switch (item_selected_idx) {
+			case 0: objectReference = ProgramValues::Objects::object0.get();  break;
+			case 1: objectReference = ProgramValues::Objects::object1.get();  break;
+			default: break;
+		}
+
+		if (objectReference) {
+			ImGui::SeparatorText("Object Light Components Properties");
+			ImGui::DragFloat("Ambient", &objectReference->ambient, 0.005f, 0.0f, 1.0f, "%.3f", flags);
+			ImGui::DragFloat("Diffuse", &objectReference->diffuse, 0.005f, 0.0f, 1.0f, "%.3f", flags);
+			ImGui::DragFloat("Specular", &objectReference->specular, 0.005f, 0.0f, 1.0f, "%.3f", flags);
+			ImGui::DragFloat("Shininess", &objectReference->shininess, 1.0f, 1.0f, 1024.0f, "%.1f", flags);
+
+
+
+			ImGui::SeparatorText("Object Components Properties");
+
+			ImGui::Text("Translate");
+			ImGui::DragFloat("translate X", &objectReference->translate.x, 0.05f);
+			ImGui::DragFloat("translate Y", &objectReference->translate.y, 0.05f);
+			ImGui::DragFloat("translate Z", &objectReference->translate.z, 0.05f);
+
+			ImGui::Text("Scale");
+			ImGui::DragFloat("scale X", &objectReference->scale.x, 0.05f);
+			ImGui::DragFloat("scale Y", &objectReference->scale.y, 0.05f);
+			ImGui::DragFloat("scale Z", &objectReference->scale.z, 0.05f);
+
+			ImGui::Text("Rotate");
+			ImGui::DragFloat("Rotate Degrees", &objectReference->rotateDegrees, 0.05f, 0.0f, 360.0f, "%.3f", flags);
+			ImGui::DragFloat("rotate X", &objectReference->rotate.x, 0.05f, 0.0f, 1.0f, "%.3f", flags);
+			ImGui::DragFloat("rotate Y", &objectReference->rotate.y, 0.05f, 0.0f, 1.0f, "%.3f", flags);
+			ImGui::DragFloat("rotate Z", &objectReference->rotate.z, 0.05f, 0.0f, 1.0f, "%.3f", flags);
+		} else {
+			ImGui::Text("No object selected.");
+		}
+
+
+		ImGui::End();
 	}
 
-	ProgramValues::Object* objectReference{};
+	{
+		ImGui::Begin("Light Properties");
 
-	switch (item_selected_idx) {
-		case 0: objectReference = ProgramValues::Objects::object0.get();  break;
-		case 1: objectReference = ProgramValues::Objects::object1.get();  break;
-		default: break;
+		const char* items[] = { "light0" };
+		static int item_selected_idx = 0; // Here we store our selection data as an index.
+
+		// Pass in the preview value visible before opening the combo (it could technically be different contents or not pulled from items[])
+		const char* combo_preview_value = items[item_selected_idx];
+
+		if (ImGui::BeginCombo("Light", combo_preview_value, flags)) {
+			for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
+				const bool is_selected = (item_selected_idx == n);
+				if (ImGui::Selectable(items[n], is_selected))
+					item_selected_idx = n;
+
+				// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+				if (is_selected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
+		ProgramValues::Light* lightReference{};
+
+		switch (item_selected_idx) {
+			case 0: lightReference = ProgramValues::Lights::light0.get();  break;
+			default: break;
+		}
+
+		if (lightReference) {
+			ImGui::SeparatorText("Light Components Properties");
+			ImGui::DragFloat("Ambient", &lightReference->ambient, 0.005f, 0.0f, 1.0f, "%.3f", flags);
+			ImGui::DragFloat("Diffuse", &lightReference->diffuse, 0.005f, 0.0f, 1.0f, "%.3f", flags);
+			ImGui::DragFloat("Specular", &lightReference->specular, 0.005f, 0.0f, 1.0f, "%.3f", flags);
+
+
+
+			ImGui::SeparatorText("Light Properties");
+
+			ImGui::Text("Translate");
+			ImGui::DragFloat("translate X", &lightReference->translate.x, 0.05f);
+			ImGui::DragFloat("translate Y", &lightReference->translate.y, 0.05f);
+			ImGui::DragFloat("translate Z", &lightReference->translate.z, 0.05f);
+
+			/*ImGui::Text("Scale");
+			ImGui::DragFloat("scale X", &objectReference->scale.x, 0.05f);
+			ImGui::DragFloat("scale Y", &objectReference->scale.y, 0.05f);
+			ImGui::DragFloat("scale Z", &objectReference->scale.z, 0.05f);
+
+			ImGui::Text("Rotate");
+			ImGui::DragFloat("Rotate Degrees", &objectReference->rotateDegrees, 0.05f, 0.0f, 360.0f, "%.3f", flags);
+			ImGui::DragFloat("rotate X", &objectReference->rotate.x, 0.05f, 0.0f, 1.0f, "%.3f", flags);
+			ImGui::DragFloat("rotate Y", &objectReference->rotate.y, 0.05f, 0.0f, 1.0f, "%.3f", flags);
+			ImGui::DragFloat("rotate Z", &objectReference->rotate.z, 0.05f, 0.0f, 1.0f, "%.3f", flags);*/
+		} else {
+			ImGui::Text("No light selected.");
+		}
+
+
+		ImGui::End();
 	}
-
-	if (objectReference) {
-		ImGui::SeparatorText("Object Light Components Properties");
-		ImGui::DragFloat("Ambient", &objectReference->ambient, 0.005f, 0.0f, 1.0f, "%.3f", flags);
-		ImGui::DragFloat("Diffuse", &objectReference->diffuse, 0.005f, 0.0f, 1.0f, "%.3f", flags);
-		ImGui::DragFloat("Specular", &objectReference->specular, 0.005f, 0.0f, 1.0f, "%.3f", flags);
-		ImGui::DragFloat("Shininess", &objectReference->shininess, 1.0f, 1.0f, 1024.0f, "%.1f", flags);
-
-		
-		
-		ImGui::SeparatorText("Object Components Properties");
-		
-		ImGui::Text("Translate");
-		ImGui::DragFloat("translate X", &objectReference->translate.x, 0.05f);
-		ImGui::DragFloat("translate Y", &objectReference->translate.y, 0.05f);
-		ImGui::DragFloat("translate Z", &objectReference->translate.z, 0.05f);
-		
-		ImGui::Text("Scale");
-		ImGui::DragFloat("scale X", &objectReference->scale.x, 0.05f);
-		ImGui::DragFloat("scale Y", &objectReference->scale.y, 0.05f);
-		ImGui::DragFloat("scale Z", &objectReference->scale.z, 0.05f);
-
-		ImGui::Text("Rotate");
-		ImGui::DragFloat("Rotate Degrees", &objectReference->rotateDegrees, 0.05f, 0.0f, 360.0f, "%.3f", flags);
-		ImGui::DragFloat("rotate X", &objectReference->rotate.x, 0.05f, 0.0f, 1.0f, "%.3f", flags);
-		ImGui::DragFloat("rotate Y", &objectReference->rotate.y, 0.05f, 0.0f, 1.0f, "%.3f", flags);
-		ImGui::DragFloat("rotate Z", &objectReference->rotate.z, 0.05f, 0.0f, 1.0f, "%.3f", flags);
-	} else {
-		ImGui::Text("No object selected.");
-	}
-
-
-	ImGui::End();
+	
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

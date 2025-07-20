@@ -45,7 +45,10 @@ namespace ProgramValues {
 	namespace Lights {
 		std::unique_ptr<Light> light0 = [] {
 			auto obj = std::make_unique<Light>();
-			obj->position = glm::vec3(0.0f, 5.0f, 0.0f);
+			obj->ambient = 0.2f;
+			obj->diffuse = 0.5f;
+			obj->specular = 1.0f;
+			obj->translate = glm::vec3(0.0f, 5.0f, 0.0f);
 			return obj;
 			}();
 	}

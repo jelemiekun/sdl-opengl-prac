@@ -29,7 +29,10 @@ namespace ProgramValues {
 	};
 
 	struct Light {
-		glm::vec3 position;
+		float ambient;
+		float diffuse;
+		float specular;
+		glm::vec3 translate;
 	};
 
 	namespace Objects {

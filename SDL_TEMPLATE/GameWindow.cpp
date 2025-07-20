@@ -245,10 +245,9 @@ void GameWindow::render() {
         100.0f
     );
     glm::mat4 view = camera->getViewMatrix();
-    glm::vec3 lightPos = ProgramValues::Lights::light0->position;
 
     // Lambda to draw a generic object
-    auto drawObject = [this, &view, &projection, &lightPos](const std::unique_ptr<ProgramValues::Object>& obj, const std::unique_ptr<Texture>& texture, int textureSlot) {
+    auto drawObject = [this, &view, &projection](const std::unique_ptr<ProgramValues::Object>& obj, const std::unique_ptr<Texture>& texture, int textureSlot) {
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, obj->translate);
         model = glm::scale(model, obj->scale);
@@ -272,18 +271,18 @@ void GameWindow::render() {
         shaderObject->setVec3("material.specular", glm::vec3(obj->specular));
         shaderObject->setFloat("material.shininess", obj->shininess);
 
-        shaderObject->setVec3("light.ambient", glm::vec3(0.2f));
-        shaderObject->setVec3("light.diffuse", glm::vec3(0.5f));
-        shaderObject->setVec3("light.specular", glm::vec3(1.0f));
-        shaderObject->setVec3("light.position", lightPos);
+        shaderObject->setVec3("light.ambient", glm::vec3(ProgramValues::Lights::light0->ambient));
+        shaderObject->setVec3("light.diffuse", glm::vec3(ProgramValues::Lights::light0->diffuse));
+        shaderObject->setVec3("light.specular", glm::vec3(ProgramValues::Lights::light0->specular));
+        shaderObject->setVec3("light.position", ProgramValues::Lights::light0->translate);
 
         glDrawElements(GL_TRIANGLES, objectIndicesCount, GL_UNSIGNED_INT, nullptr);
         };
 
     // Lambda to draw the light as an object
-    auto drawLight = [this, &projection, &view](const glm::vec3& lightPosition) {
+    auto drawLight = [this, &projection, &view]() {
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPosition);
+        model = glm::translate(model, ProgramValues::Lights::light0->translate);
 
         shaderLight->bind();
         vaoLight->Bind();
@@ -302,7 +301,7 @@ void GameWindow::render() {
     drawObject(ProgramValues::Objects::object1, texture2, 1);
 
     // Draw light
-    drawLight(lightPos);
+    drawLight();
 
     // Render ImGui
     game->imGuiWindow->render();
