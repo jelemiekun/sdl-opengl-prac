@@ -19,7 +19,7 @@ namespace ProgramValues {
 		glm::vec3 diffuse = glm::vec3(0.5f);
 		glm::vec3 specular = glm::vec3(1.0f);
 		glm::vec3 color = glm::vec3(1.0f);
-		glm::vec3 position = { 0.0f, 2.0f, 0.0f };
+		glm::vec3 position = { 1.0f, 0.3f, 0.5f };
 		glm::vec3 scale = glm::vec3(1.0f);
 		glm::vec3 rotate = glm::vec3(1.0f);
 		int rotateDegrees = 0.0f;

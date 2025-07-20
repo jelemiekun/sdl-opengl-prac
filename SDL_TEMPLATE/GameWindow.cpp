@@ -33,6 +33,19 @@ static std::unique_ptr<VertexArray> vaoLight;
 static std::unique_ptr<VertexBuffer> vboLight;
 static std::unique_ptr<ElementBuffer> eboLight;
 
+static glm::vec3 cubePositions[] = {
+    glm::vec3(0.0f,  0.0f,  0.0f),
+    glm::vec3(2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3(2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3(1.3f, -2.0f, -2.5f),
+    glm::vec3(1.5f,  2.0f, -2.5f),
+    glm::vec3(1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
+};
+
 // Constructor
 GameWindow::GameWindow()
     : mWindow(nullptr), openGLContext(nullptr), mWindowID(-1),
@@ -271,9 +284,25 @@ void GameWindow::render() {
         0.1f, 
         100.0f
     );
-    glm::mat4 view = camera->getViewMatrix();
+    glm::mat4 objectModel = glm::mat4(1.0f);
+    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(objectModel)));
 
-    auto drawModel = [](Shader& shader, glm::mat4& model, int indicesCount) -> void {
+    auto drawModel = [this, &projection, &objectModel, &normalMatrix](Shader& shader, glm::mat4& model, int indicesCount) -> void {
+        shaderObject->setMat4("u_Projection", projection);
+        shaderObject->setMat4("u_View", camera->getViewMatrix());
+        shaderObject->setMat4("u_Model", objectModel);
+        shaderObject->setMat3("u_NormalMatrix", normalMatrix);
+
+        shaderObject->setVec3("light.direction", ProgramValues::LightSource::position);
+        shaderObject->setVec3("light.ambient", ProgramValues::LightSource::ambient);
+        shaderObject->setVec3("light.diffuse", ProgramValues::LightSource::diffuse);
+        shaderObject->setVec3("light.specular", ProgramValues::LightSource::specular);
+
+
+        shaderObject->setVec3("u_CameraPos", camera->position);
+
+        shaderObject->setFloat("material.shininess", ProgramValues::Object::shininess);
+
         shader.setMat4("u_Model", model);
         glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
     };
@@ -281,90 +310,50 @@ void GameWindow::render() {
     {
         textureObjectDiffuse->bind(0);
         shaderObject->setInt("material.diffuse", 0);
-
         shaderObject->use();
         vaoObject->Bind();
 
-        glm::mat4 objectModel = glm::mat4(1.0f);
-        objectModel = glm::scale(objectModel, glm::vec3(5.0f, 5.0f, 5.0f));
-        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(objectModel)));
+        for (unsigned int i = 0; i < 10; i++) {
+            objectModel = glm::mat4(1.0f);
+            objectModel = glm::scale(objectModel, glm::vec3(5.0f, 5.0f, 5.0f));
+            objectModel = glm::translate(objectModel, cubePositions[i]);
+            float angle = 20.0f * i;
+            objectModel = glm::rotate(objectModel, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
-        // shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+            drawModel(*shaderObject, objectModel, indicesCountObject);
+        }
 
-        shaderObject->setMat4("u_Projection", projection);
-        shaderObject->setMat4("u_View", view);
-        shaderObject->setMat4("u_Model", objectModel);
-        shaderObject->setMat3("u_NormalMatrix", normalMatrix);
-
-        shaderObject->setVec3("light.position", ProgramValues::LightSource::position);
-        shaderObject->setVec3("light.ambient", ProgramValues::LightSource::ambient);
-        shaderObject->setVec3("light.diffuse", ProgramValues::LightSource::diffuse);
-        shaderObject->setVec3("light.specular", ProgramValues::LightSource::specular);
-
-
-        shaderObject->setVec3("u_CameraPos", camera->position);
-
-        // shaderObject->setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-        // shaderObject->setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
-        // shaderObject->setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-
-        shaderObject->setFloat("material.shininess", ProgramValues::Object::shininess);
-
-        drawModel(*shaderObject, objectModel, indicesCountObject);
     }
 
     {
         textureObjectSpecular->bind(1);
         shaderObject->setInt("material.specular", 1);
-
         shaderObject->use();
         vaoObject->Bind();
 
-        glm::mat4 objectModel = glm::mat4(1.0f);
+        objectModel = glm::mat4(1.0f);
         objectModel = glm::scale(objectModel, glm::vec3(5.0f, 5.0f, 5.0f));
-        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(objectModel)));
-
-        // shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-
-        shaderObject->setMat4("u_Projection", projection);
-        shaderObject->setMat4("u_View", view);
-        shaderObject->setMat4("u_Model", objectModel);
-        shaderObject->setMat3("u_NormalMatrix", normalMatrix);
-
-        shaderObject->setVec3("light.position", ProgramValues::LightSource::position);
-        shaderObject->setVec3("light.ambient", ProgramValues::LightSource::ambient);
-        shaderObject->setVec3("light.diffuse", ProgramValues::LightSource::diffuse);
-        shaderObject->setVec3("light.specular", ProgramValues::LightSource::specular);
-
-
-        shaderObject->setVec3("u_CameraPos", camera->position);
-
-        // shaderObject->setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-        // shaderObject->setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
-        // shaderObject->setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-
-        shaderObject->setFloat("material.shininess", ProgramValues::Object::shininess);
 
         drawModel(*shaderObject, objectModel, indicesCountObject);
     }
 
     
-    shaderLight->use();
-    vaoLight->Bind();
+    //shaderLight->use();
+    //vaoLight->Bind();
 
-    glm::mat4 lightModel = glm::mat4(1.0f);
-    lightModel = glm::translate(lightModel, ProgramValues::LightSource::position);
-    lightModel = glm::scale(lightModel, ProgramValues::LightSource::scale);
-    lightModel = glm::rotate(lightModel, glm::radians(static_cast<float>(ProgramValues::LightSource::rotateDegrees)), ProgramValues::LightSource::rotate);
-    
+    //glm::mat4 lightModel = glm::mat4(1.0f);
+    //lightModel = glm::translate(lightModel, ProgramValues::LightSource::position);
+    //lightModel = glm::scale(lightModel, ProgramValues::LightSource::scale);
+    //lightModel = glm::rotate(lightModel, glm::radians(static_cast<float>(ProgramValues::LightSource::rotateDegrees)), ProgramValues::LightSource::rotate);
+    //
 
-    // shaderLight->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-    // shaderLight->setVec3("u_LightColor", glm::vec3(1.0f));
-    shaderLight->setMat4("u_Projection", projection);
-    shaderLight->setMat4("u_View", view);
-    shaderLight->setMat4("u_Model", lightModel);
+    //// shaderLight->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+    //// shaderLight->setVec3("u_LightColor", glm::vec3(1.0f));
+    //shaderLight->setMat4("u_Projection", projection);
+    //shaderLight->setMat4("u_View", camera->getViewMatrix());
+    //shaderLight->setMat4("u_Model", lightModel);
 
-    drawModel(*shaderLight, lightModel, indicesCountLight);
+    //drawModel(*shaderLight, lightModel, indicesCountLight);
 
 
     game->imGuiWindow->render();
