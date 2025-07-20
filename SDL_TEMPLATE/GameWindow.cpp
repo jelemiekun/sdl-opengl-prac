@@ -278,41 +278,75 @@ void GameWindow::render() {
         glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
     };
 
-    textureObjectDiffuse->bind(0);
-    shaderObject->setInt("material.diffuse", 0);
+    {
+        textureObjectDiffuse->bind(0);
+        shaderObject->setInt("material.diffuse", 0);
 
-    textureObjectSpecular->bind(1);
-    shaderObject->setInt("material.specular", 1);
+        shaderObject->use();
+        vaoObject->Bind();
 
-    shaderObject->use();
-    vaoObject->Bind();
-    
-    glm::mat4 objectModel = glm::mat4(1.0f);
-    objectModel = glm::scale(objectModel, glm::vec3(5.0f, 5.0f, 5.0f));
-    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(objectModel)));
-    
-    // shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+        glm::mat4 objectModel = glm::mat4(1.0f);
+        objectModel = glm::scale(objectModel, glm::vec3(5.0f, 5.0f, 5.0f));
+        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(objectModel)));
 
-    shaderObject->setMat4("u_Projection", projection);
-    shaderObject->setMat4("u_View", view);
-    shaderObject->setMat4("u_Model", objectModel);
-    shaderObject->setMat3("u_NormalMatrix", normalMatrix);
+        // shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
 
-    shaderObject->setVec3("light.position", ProgramValues::LightSource::position);
-    shaderObject->setVec3("light.ambient", ProgramValues::LightSource::ambient);
-    shaderObject->setVec3("light.diffuse", ProgramValues::LightSource::diffuse);
-    shaderObject->setVec3("light.specular", ProgramValues::LightSource::specular);
+        shaderObject->setMat4("u_Projection", projection);
+        shaderObject->setMat4("u_View", view);
+        shaderObject->setMat4("u_Model", objectModel);
+        shaderObject->setMat3("u_NormalMatrix", normalMatrix);
+
+        shaderObject->setVec3("light.position", ProgramValues::LightSource::position);
+        shaderObject->setVec3("light.ambient", ProgramValues::LightSource::ambient);
+        shaderObject->setVec3("light.diffuse", ProgramValues::LightSource::diffuse);
+        shaderObject->setVec3("light.specular", ProgramValues::LightSource::specular);
 
 
-    shaderObject->setVec3("u_CameraPos", camera->position);
+        shaderObject->setVec3("u_CameraPos", camera->position);
 
-    // shaderObject->setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
-    shaderObject->setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
-    shaderObject->setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+        // shaderObject->setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+        // shaderObject->setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+        // shaderObject->setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
 
-    shaderObject->setFloat("material.shininess", ProgramValues::Object::shininess);
+        shaderObject->setFloat("material.shininess", ProgramValues::Object::shininess);
 
-    drawModel(*shaderObject, objectModel, indicesCountObject);
+        drawModel(*shaderObject, objectModel, indicesCountObject);
+    }
+
+    {
+        textureObjectSpecular->bind(1);
+        shaderObject->setInt("material.specular", 1);
+
+        shaderObject->use();
+        vaoObject->Bind();
+
+        glm::mat4 objectModel = glm::mat4(1.0f);
+        objectModel = glm::scale(objectModel, glm::vec3(5.0f, 5.0f, 5.0f));
+        glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(objectModel)));
+
+        // shaderObject->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+
+        shaderObject->setMat4("u_Projection", projection);
+        shaderObject->setMat4("u_View", view);
+        shaderObject->setMat4("u_Model", objectModel);
+        shaderObject->setMat3("u_NormalMatrix", normalMatrix);
+
+        shaderObject->setVec3("light.position", ProgramValues::LightSource::position);
+        shaderObject->setVec3("light.ambient", ProgramValues::LightSource::ambient);
+        shaderObject->setVec3("light.diffuse", ProgramValues::LightSource::diffuse);
+        shaderObject->setVec3("light.specular", ProgramValues::LightSource::specular);
+
+
+        shaderObject->setVec3("u_CameraPos", camera->position);
+
+        // shaderObject->setVec3("material.ambient", glm::vec3(1.0f, 0.5f, 0.31f));
+        // shaderObject->setVec3("material.diffuse", glm::vec3(1.0f, 0.5f, 0.31f));
+        // shaderObject->setVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+
+        shaderObject->setFloat("material.shininess", ProgramValues::Object::shininess);
+
+        drawModel(*shaderObject, objectModel, indicesCountObject);
+    }
 
     
     shaderLight->use();
