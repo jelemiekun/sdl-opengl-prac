@@ -61,80 +61,69 @@ void ImGuiWindow::render() {
 	ImGui::NewFrame();
 
 	ImGuiIO& io = ImGui::GetIO();
+	static ImGuiComboFlags flags = 0;
 
 	ImGui::ShowDemoWindow();
 
-	ImGui::Begin("Light Source");
-	ImGui::SeparatorText("Properties");
+	ImGui::Begin("Object Properties");
 
-	const char* childLabels[] = {"Shininess", "Ambient", "Diffuse", "Specular", "Translate", "Scale", "Rotate" };
-	const int numLabels = sizeof(childLabels) / sizeof(childLabels[0]);
-	const float LIGHT_SCALAR = 0.005f;
+	const char* items[] = { "pic.jpg", "container2.png" };
+	static int item_selected_idx = 0; // Here we store our selection data as an index.
 
-	for (int i = 0; i < numLabels; i++) {
-		static ImGuiSliderFlags flags = ImGuiSliderFlags_None;
-		ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+	// Pass in the preview value visible before opening the combo (it could technically be different contents or not pulled from items[])
+	const char* combo_preview_value = items[item_selected_idx];
 
-		ImGui::PushID(i);
-		if (ImGui::TreeNode("", "%s", childLabels[i])) {
-			if (i == 0) {
-				ImGui::DragInt("Shininess", &ProgramValues::Object::shininess, LIGHT_SCALAR, 1, 256, "%d", flags);
-			}
-			if (i == 1) {
-				ImGui::DragFloat("X value", &ProgramValues::LightSource::ambient.x, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
-				ImGui::DragFloat("Y value", &ProgramValues::LightSource::ambient.y, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
-				ImGui::DragFloat("Z value", &ProgramValues::LightSource::ambient.z, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
+	if (ImGui::BeginCombo("Object", combo_preview_value, flags)) {
+		for (int n = 0; n < IM_ARRAYSIZE(items); n++) {
+			const bool is_selected = (item_selected_idx == n);
+			if (ImGui::Selectable(items[n], is_selected))
+				item_selected_idx = n;
 
-				if (ProgramValues::LightSource::ambient.x < 0.1f) ProgramValues::LightSource::ambient.x = 0.1f;
-				if (ProgramValues::LightSource::ambient.y < 0.1f) ProgramValues::LightSource::ambient.y = 0.1f;
-				if (ProgramValues::LightSource::ambient.z < 0.1f) ProgramValues::LightSource::ambient.z = 0.1f;
-			}
-			if (i == 2) {
-				ImGui::DragFloat("X value", &ProgramValues::LightSource::diffuse.x, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
-				ImGui::DragFloat("Y value", &ProgramValues::LightSource::diffuse.y, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
-				ImGui::DragFloat("Z value", &ProgramValues::LightSource::diffuse.z, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
-
-				if (ProgramValues::LightSource::diffuse.x < 0.1f) ProgramValues::LightSource::diffuse.x = 0.1f;
-				if (ProgramValues::LightSource::diffuse.y < 0.1f) ProgramValues::LightSource::diffuse.y = 0.1f;
-				if (ProgramValues::LightSource::diffuse.z < 0.1f) ProgramValues::LightSource::diffuse.z = 0.1f;
-			}
-			if (i == 3) {
-				ImGui::DragFloat("X value", &ProgramValues::LightSource::specular.x, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
-				ImGui::DragFloat("Y value", &ProgramValues::LightSource::specular.y, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
-				ImGui::DragFloat("Z value", &ProgramValues::LightSource::specular.z, LIGHT_SCALAR, 0.1f, 1.0f, "%.3f", flags);
-
-				if (ProgramValues::LightSource::specular.x < 0.1f) ProgramValues::LightSource::specular.x = 0.1f;
-				if (ProgramValues::LightSource::specular.y < 0.1f) ProgramValues::LightSource::specular.y = 0.1f;
-				if (ProgramValues::LightSource::specular.z < 0.1f) ProgramValues::LightSource::specular.z = 0.1f;
-			}
-			if (i == 4) {
-				ImGui::DragFloat("X value", &ProgramValues::LightSource::position.x, LIGHT_SCALAR);
-				ImGui::DragFloat("Y value", &ProgramValues::LightSource::position.y, LIGHT_SCALAR);
-				ImGui::DragFloat("Z value", &ProgramValues::LightSource::position.z, LIGHT_SCALAR);
-			}
-			if (i == 5) {
-				ImGui::DragFloat("X value", &ProgramValues::LightSource::scale.x, LIGHT_SCALAR);
-				ImGui::DragFloat("Y value", &ProgramValues::LightSource::scale.y, LIGHT_SCALAR);
-				ImGui::DragFloat("Z value", &ProgramValues::LightSource::scale.z, LIGHT_SCALAR);
-
-				if (ProgramValues::LightSource::scale.x < 0.1f) ProgramValues::LightSource::scale.x = 0.1f;
-				if (ProgramValues::LightSource::scale.y < 0.1f) ProgramValues::LightSource::scale.y = 0.1f;
-				if (ProgramValues::LightSource::scale.z < 0.1f) ProgramValues::LightSource::scale.z = 0.1f;
-			}
-			if (i == 6) {
-				ImGui::DragInt("Degrees: ", &ProgramValues::LightSource::rotateDegrees, 1.0f, 1, 360, "%d", flags);
-				ImGui::DragFloat("X value", &ProgramValues::LightSource::rotate.x, LIGHT_SCALAR, 1.0f, 360.0f, "%.3f", flags);
-				ImGui::DragFloat("Y value", &ProgramValues::LightSource::rotate.y, LIGHT_SCALAR, 1.0f, 360.0f, "%.3f", flags);
-				ImGui::DragFloat("Z value", &ProgramValues::LightSource::rotate.z, LIGHT_SCALAR, 1.0f, 360.0f, "%.3f", flags);
-
-				if (ProgramValues::LightSource::rotate.x < 1.0f) ProgramValues::LightSource::rotate.x = 1.0f;
-				if (ProgramValues::LightSource::rotate.y < 1.0f) ProgramValues::LightSource::rotate.y = 1.0f;
-				if (ProgramValues::LightSource::rotate.z < 1.0f) ProgramValues::LightSource::rotate.z = 1.0f;
-			}
-			ImGui::TreePop();
+			// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+			if (is_selected)
+				ImGui::SetItemDefaultFocus();
 		}
-		ImGui::PopID();
+		ImGui::EndCombo();
 	}
+
+	ProgramValues::Object* objectReference{};
+
+	switch (item_selected_idx) {
+		case 0: objectReference = ProgramValues::Objects::object0.get();  break;
+		case 1: objectReference = ProgramValues::Objects::object1.get();  break;
+		default: break;
+	}
+
+	if (objectReference) {
+		ImGui::SeparatorText("Object Light Components Properties");
+		ImGui::DragFloat("Ambient", &objectReference->ambient, 0.005f, 0.0f, 1.0f, "%.3f", flags);
+		ImGui::DragFloat("Diffuse", &objectReference->diffuse, 0.005f, 0.0f, 1.0f, "%.3f", flags);
+		ImGui::DragFloat("Specular", &objectReference->specular, 0.005f, 0.0f, 1.0f, "%.3f", flags);
+		ImGui::DragFloat("Shininess", &objectReference->shininess, 1.0f, 1.0f, 1024.0f, "%.1f", flags);
+
+		
+		
+		ImGui::SeparatorText("Object Components Properties");
+		
+		ImGui::Text("Translate");
+		ImGui::DragFloat("translate X", &objectReference->translate.x, 0.05f);
+		ImGui::DragFloat("translate Y", &objectReference->translate.y, 0.05f);
+		ImGui::DragFloat("translate Z", &objectReference->translate.z, 0.05f);
+		
+		ImGui::Text("Scale");
+		ImGui::DragFloat("scale X", &objectReference->scale.x, 0.05f);
+		ImGui::DragFloat("scale Y", &objectReference->scale.y, 0.05f);
+		ImGui::DragFloat("scale Z", &objectReference->scale.z, 0.05f);
+
+		ImGui::Text("Rotate");
+		ImGui::DragFloat("Rotate Degrees", &objectReference->rotateDegrees, 0.05f, 0.0f, 360.0f, "%.3f", flags);
+		ImGui::DragFloat("rotate X", &objectReference->rotate.x, 0.05f, 0.0f, 1.0f, "%.3f", flags);
+		ImGui::DragFloat("rotate Y", &objectReference->rotate.y, 0.05f, 0.0f, 1.0f, "%.3f", flags);
+		ImGui::DragFloat("rotate Z", &objectReference->rotate.z, 0.05f, 0.0f, 1.0f, "%.3f", flags);
+	} else {
+		ImGui::Text("No object selected.");
+	}
+
 
 	ImGui::End();
 

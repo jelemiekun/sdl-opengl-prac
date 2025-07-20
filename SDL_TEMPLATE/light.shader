@@ -22,8 +22,12 @@ void main() {
 #shader fragment
 #version 430 core
 
+in vec2 imgCoordinates;
+
 out vec4 FragColor;
 
+uniform sampler2D texture1;
+
 void main(){
-	FragColor = vec4(1.0f);
+	FragColor = texture(texture1, imgCoordinates) ;
 }

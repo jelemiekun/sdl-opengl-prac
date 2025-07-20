@@ -113,7 +113,9 @@
     <None Include="source.shader">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="light.shader" />
+    <None Include="light.shader">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imconfig.h">

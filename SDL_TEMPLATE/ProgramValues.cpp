@@ -14,18 +14,39 @@ namespace ProgramValues {
 		bool fastZoom = false;
 	}
 
-	namespace LightSource {
-		glm::vec3 ambient = glm::vec3(0.2f);
-		glm::vec3 diffuse = glm::vec3(0.5f);
-		glm::vec3 specular = glm::vec3(1.0f);
-		glm::vec3 color = glm::vec3(1.0f);
-		glm::vec3 position = { 0.0f, 2.0f, 0.0f };
-		glm::vec3 scale = glm::vec3(1.0f);
-		glm::vec3 rotate = glm::vec3(1.0f);
-		int rotateDegrees = 0.0f;
+	namespace Objects {
+		std::unique_ptr<Object> object0 = [] {
+			auto obj = std::make_unique<Object>();
+			obj->ambient = 0.2f;
+			obj->diffuse = 0.5f;
+			obj->specular = 1.0f;
+			obj->shininess = 32.0f;
+			obj->translate = glm::vec3(0.0f, 0.0f, 0.0f);
+			obj->scale = glm::vec3(1.0f, 1.0f, 1.0f);
+			obj->rotateDegrees = 0.0f;
+			obj->rotate = glm::vec3(0.0f, 1.0f, 0.0f);
+			return obj;
+			}();
+
+		std::unique_ptr<Object> object1 = [] {
+			auto obj = std::make_unique<Object>();
+			obj->ambient = 0.2f;
+			obj->diffuse = 0.5f;
+			obj->specular = 1.0f;
+			obj->shininess = 32.0f;
+			obj->translate = glm::vec3(0.0f, 2.5f, 0.0f);
+			obj->scale = glm::vec3(1.0f, 1.0f, 1.0f);
+			obj->rotateDegrees = 0.0f;
+			obj->rotate = glm::vec3(0.0f, 1.0f, 0.0f);
+			return obj;
+			}();
 	}
 
-	namespace Object {
-		int shininess = 1.0f;
+	namespace Lights {
+		std::unique_ptr<Light> light0 = [] {
+			auto obj = std::make_unique<Light>();
+			obj->position = glm::vec3(0.0f, 5.0f, 0.0f);
+			return obj;
+			}();
 	}
 }

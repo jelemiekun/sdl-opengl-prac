@@ -2,27 +2,27 @@
 #version 430 core
 	
 layout (location = 0) in vec3 L_coordinates;
-layout (location = 1) in vec3 L_normal;
-layout (location = 2) in vec2 L_texCoords;
+layout (location = 1) in vec2 L_imgCoordinates;
+layout (location = 2) in vec3 L_norm;
+
+out vec2 imgCoordinates;
+out vec3 normal;
+out vec3 fragPos;
 
 uniform mat3 u_NormalMatrix;
 uniform mat4 u_Model;
 uniform mat4 u_View;
 uniform mat4 u_Projection;
 
-out vec3 FragPos;
-out vec3 Normal;
-out vec2 TexCoords;
-
 void main() {
 	vec4 pos = vec4(L_coordinates, 1.0f);
 	pos = u_Projection * u_View * u_Model * pos;
 	gl_Position = pos;
 
-	Normal = u_NormalMatrix * L_normal;
-	FragPos = vec3(u_Model * vec4(L_coordinates, 1.0f));
+	imgCoordinates = L_imgCoordinates;
+	normal = u_NormalMatrix * L_norm;
 
-	TexCoords = L_texCoords;
+	fragPos = vec3(u_Model * vec4(L_coordinates, 1.0f));
 }
 
 
@@ -31,53 +31,52 @@ void main() {
 #version 430 core
 
 struct Material {
-	sampler2D diffuse;
-	sampler2D specular;
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
 	float shininess;
 };
 
 struct Light {
-	vec3 color;
 	vec3 position;
-
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
 };
 
-uniform Material material;
-uniform Light light;
-
-in vec3 Normal;
-in vec3 FragPos;
-in vec2 TexCoords;
+in vec2 imgCoordinates;
+in vec3 normal;
+in vec3 fragPos;
 
 out vec4 FragColor;
 
-uniform vec3 u_ObjectColor;
+uniform sampler2D texture1;
+uniform Material material;
+uniform Light light;
 uniform vec3 u_CameraPos;
 
 void main(){
-	// ambient
-	vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
+	// ambient	
+	vec3 ambient = material.ambient * light.ambient;
 
 	// diffuse
-	vec3 norm = normalize(Normal);
-	vec3 lightDir = normalize(light.position - FragPos);
+	vec3 norm = normalize(normal);
+	vec3 lightDir = normalize(light.position - fragPos);
 
 	float diff = max(dot(norm, lightDir), 0.0f);
-	vec3 diffuse = light.diffuse * (diff * vec3(texture(material.diffuse, TexCoords)));
+	vec3 diffuse = light.diffuse * (diff * material.diffuse);
 
 	// specular
-	vec3 viewDir = normalize(u_CameraPos - FragPos);
+	vec3 viewDir = normalize(u_CameraPos - fragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);
 
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
 
-	vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
+	vec3 specular = light.specular * (spec * material.specular);
 
-	// final
-	vec3 finalColor = (ambient + diffuse + specular);
+	vec3 combinedLights = (ambient + diffuse + specular);
 
-	FragColor = vec4(finalColor, 1.0f);
+	vec4 texColor = texture(texture1, imgCoordinates);
+	vec3 resultColor = texColor.rgb * combinedLights;
+	FragColor = vec4(resultColor, texColor.a);
 }

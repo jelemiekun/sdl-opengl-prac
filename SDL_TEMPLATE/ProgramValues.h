@@ -1,5 +1,6 @@
 #pragma once
 #include <glm/gtc/matrix_transform.hpp>
+#include <memory>
 
 namespace ProgramValues {
 	namespace KeyEvents {
@@ -13,21 +14,31 @@ namespace ProgramValues {
 		extern bool moveDownPressed;
 		extern bool sprinting;
 		extern bool fastZoom;
-	}
+	};
 
-	namespace LightSource {
-		extern glm::vec3 ambient;
-		extern glm::vec3 diffuse;
-		extern glm::vec3 specular;
-		extern glm::vec3 color;
-		extern glm::vec3 position;
-		extern glm::vec3 scale;
-		extern glm::vec3 rotate;
-		extern int rotateDegrees;
-	}
+	struct Object {
+		float ambient;
+		float diffuse;
+		float specular;
+		float shininess;
 
-	namespace Object {
-		extern int shininess;
+		glm::vec3 translate;
+		glm::vec3 scale;
+		float rotateDegrees;
+		glm::vec3 rotate;
+	};
+
+	struct Light {
+		glm::vec3 position;
+	};
+
+	namespace Objects {
+		extern std::unique_ptr<Object> object0;
+		extern std::unique_ptr<Object> object1;
+	};
+
+	namespace Lights {
+		extern std::unique_ptr<Light> light0;
 	}
 };
 
