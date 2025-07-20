@@ -24,7 +24,8 @@ static std::unique_ptr<VertexArray> vaoObject;
 static std::unique_ptr<VertexBuffer> vboObject;
 static std::unique_ptr<ElementBuffer> eboObject;
 static std::unique_ptr<Texture> texture1;
-static std::unique_ptr<Texture> texture2;
+static std::unique_ptr<Texture> texture2DiffuseMap;
+static std::unique_ptr<Texture> texture2SpecularMap;
 static int objectIndicesCount;
 
 static std::unique_ptr<Shader> shaderLight;
@@ -134,7 +135,8 @@ void GameWindow::setupDraw() {
     eboObject->Bind();
 
 
-    texture2 = std::make_unique<Texture>("assets/container2.png");
+    texture2DiffuseMap = std::make_unique<Texture>("assets/container2.png");
+    texture2SpecularMap = std::make_unique<Texture>("assets/container2_specular.png");
 
 
     shaderLight = std::make_unique<Shader>("light.shader");
@@ -258,7 +260,13 @@ void GameWindow::render() {
         shaderObject->bind();
         vaoObject->Bind();
         texture->bind(textureSlot);
-        shaderObject->setInt("texture1", textureSlot);
+
+        switch (textureSlot) {
+            case 0: shaderObject->setInt("material.diffuse", textureSlot); break;
+            case 1: shaderObject->setInt("material.diffuse", textureSlot); break;
+            case 2: shaderObject->setInt("material.specular", textureSlot); break;
+            default: break;
+        }
 
         shaderObject->setMat3("u_NormalMatrix", normalMatrix);
         shaderObject->setMat4("u_Model", model);
@@ -298,7 +306,8 @@ void GameWindow::render() {
 
     // Draw objects
     drawObject(ProgramValues::Objects::object0, texture1, 0);
-    drawObject(ProgramValues::Objects::object1, texture2, 1);
+    drawObject(ProgramValues::Objects::object1, texture2DiffuseMap, 1);
+    drawObject(ProgramValues::Objects::object1, texture2SpecularMap, 2);
 
     // Draw light
     drawLight();
