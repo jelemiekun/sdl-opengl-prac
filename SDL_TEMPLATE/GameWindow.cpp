@@ -293,7 +293,7 @@ void GameWindow::render() {
         shaderObject->setMat4("u_Model", objectModel);
         shaderObject->setMat3("u_NormalMatrix", normalMatrix);
 
-        shaderObject->setVec3("light.direction", ProgramValues::LightSource::position);
+        shaderObject->setVec3("light.position", ProgramValues::LightSource::position);
         shaderObject->setVec3("light.ambient", ProgramValues::LightSource::ambient);
         shaderObject->setVec3("light.diffuse", ProgramValues::LightSource::diffuse);
         shaderObject->setVec3("light.specular", ProgramValues::LightSource::specular);
@@ -302,6 +302,11 @@ void GameWindow::render() {
         shaderObject->setVec3("u_CameraPos", camera->position);
 
         shaderObject->setFloat("material.shininess", ProgramValues::Object::shininess);
+
+        shaderObject->setVec3("light.position", camera->position);
+        shaderObject->setVec3("light.direction", camera->front);
+        shaderObject->setFloat("light.innerCutoff", glm::cos(glm::radians(12.5)));
+        shaderObject->setFloat("light.outerCutoff", glm::cos(glm::radians(17.5)));
 
         shader.setMat4("u_Model", model);
         glDrawElements(GL_TRIANGLES, indicesCount, GL_UNSIGNED_INT, nullptr);
@@ -338,22 +343,22 @@ void GameWindow::render() {
     }
 
     
-    //shaderLight->use();
-    //vaoLight->Bind();
+    shaderLight->use();
+    vaoLight->Bind();
 
-    //glm::mat4 lightModel = glm::mat4(1.0f);
-    //lightModel = glm::translate(lightModel, ProgramValues::LightSource::position);
-    //lightModel = glm::scale(lightModel, ProgramValues::LightSource::scale);
-    //lightModel = glm::rotate(lightModel, glm::radians(static_cast<float>(ProgramValues::LightSource::rotateDegrees)), ProgramValues::LightSource::rotate);
-    //
+    glm::mat4 lightModel = glm::mat4(1.0f);
+    lightModel = glm::translate(lightModel, ProgramValues::LightSource::position);
+    lightModel = glm::scale(lightModel, ProgramValues::LightSource::scale);
+    lightModel = glm::rotate(lightModel, glm::radians(static_cast<float>(ProgramValues::LightSource::rotateDegrees)), ProgramValues::LightSource::rotate);
+    
 
-    //// shaderLight->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
-    //// shaderLight->setVec3("u_LightColor", glm::vec3(1.0f));
-    //shaderLight->setMat4("u_Projection", projection);
-    //shaderLight->setMat4("u_View", camera->getViewMatrix());
-    //shaderLight->setMat4("u_Model", lightModel);
+    // shaderLight->setVec3("u_ObjectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+    // shaderLight->setVec3("u_LightColor", glm::vec3(1.0f));
+    shaderLight->setMat4("u_Projection", projection);
+    shaderLight->setMat4("u_View", camera->getViewMatrix());
+    shaderLight->setMat4("u_Model", lightModel);
 
-    //drawModel(*shaderLight, lightModel, indicesCountLight);
+    drawModel(*shaderLight, lightModel, indicesCountLight);
 
 
     game->imGuiWindow->render();
