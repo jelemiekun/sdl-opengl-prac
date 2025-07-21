@@ -209,7 +209,7 @@ void GameWindow::setupDraw() {
     textureObjectSpecular = std::make_unique<Texture2D>("assets/container2_specular.png");
 
     model1 = std::make_unique<Model>("assets/models/military_backpack/scene.gltf");
-    model2 = std::make_unique<Model>("assets/models/scifi_soldier_character_low_poly/scene.gltf");
+    model2 = std::make_unique<Model>("assets/models/american_high_school.glb");
 }
 
 
@@ -309,7 +309,7 @@ void GameWindow::render() {
     
     model = glm::mat4(1.0f);
     model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, 20.0f));
     shaderObject->setMat4("u_Model", model);
     model2->Draw(*shaderObject);
     
@@ -317,7 +317,7 @@ void GameWindow::render() {
         glm::radians(camera->getFOV()), 
         (float)mWidth / (float)mHeight,
         0.1f, 
-        100.0f
+        2000.0f
     );
     glm::mat4 objectModel = glm::mat4(1.0f);
     
