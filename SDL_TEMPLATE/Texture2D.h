@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-class Texture {
+class Texture2D {
 private:
 	unsigned int rendererID;
 	std::string filePath;
@@ -12,8 +12,8 @@ private:
 	int bpp;
 
 public:
-	Texture(const std::string& path);
-	~Texture();
+	Texture2D(const std::string& path);
+	~Texture2D();
 
 	void bind(unsigned int slot = 0) const;
 	void unbind() const;

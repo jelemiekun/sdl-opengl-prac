@@ -6,19 +6,23 @@
 #include "VertexBuffer.h"
 #include "ElementBuffer.h"
 #include "Shader.h"
-#include "Texture.h"
+#include "Texture2D.h"
 #include "Camera.h"
 #include "Game.h"
 #include "ImGuiWindow.h"
 #include "ProgramValues.h"
+#include "Model.h"
 
 static Game* game = Game::getInstance();
 
 static constexpr int INITIAL_WIDTH = 1280;
 static constexpr int INITIAL_HEIGHT = 720;
 
-static std::unique_ptr<Texture> textureObjectDiffuse;
-static std::unique_ptr<Texture> textureObjectSpecular;
+static std::unique_ptr<Model> model1;
+static std::unique_ptr<Model> model2;
+
+static std::unique_ptr<Texture2D> textureObjectDiffuse;
+static std::unique_ptr<Texture2D> textureObjectSpecular;
 static std::unique_ptr<Camera> camera;
 
 static int indicesCountObject;
@@ -201,8 +205,11 @@ void GameWindow::setupDraw() {
     eboLight->Bind();
     vboLight->Unbind();
 
-    textureObjectDiffuse = std::make_unique<Texture>("assets/container2.png");
-    textureObjectSpecular = std::make_unique<Texture>("assets/container2_specular.png");
+    textureObjectDiffuse = std::make_unique<Texture2D>("assets/container2.png");
+    textureObjectSpecular = std::make_unique<Texture2D>("assets/container2_specular.png");
+
+    model1 = std::make_unique<Model>("assets/models/military_backpack/scene.gltf");
+    model2 = std::make_unique<Model>("assets/models/scifi_soldier_character_low_poly/scene.gltf");
 }
 
 
@@ -291,7 +298,21 @@ void GameWindow::render() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    
 
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
+    shaderObject->setMat4("u_Model", model);
+    model1->Draw(*shaderObject);
+    
+    
+    model = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    model = glm::translate(model, glm::vec3(0.0f, -5.0f, 0.0f));
+    shaderObject->setMat4("u_Model", model);
+    model2->Draw(*shaderObject);
+    
     glm::mat4 projection = glm::perspective(
         glm::radians(camera->getFOV()), 
         (float)mWidth / (float)mHeight,
@@ -375,7 +396,7 @@ void GameWindow::render() {
 
     { // Objects
         textureObjectDiffuse->bind(0);
-        shaderObject->setInt("material.diffuse", 0);
+        // shaderObject->setInt("material.diffuse", 0);
         shaderObject->use();
         vaoObject->Bind();
 
@@ -393,7 +414,7 @@ void GameWindow::render() {
 
     {
         textureObjectSpecular->bind(1);
-        shaderObject->setInt("material.specular", 1);
+        // shaderObject->setInt("material.specular", 1);
         shaderObject->use();
         vaoObject->Bind();
 
