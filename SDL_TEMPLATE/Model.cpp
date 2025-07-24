@@ -1,15 +1,18 @@
 #include "Model.h"
 #include <stb_image.h>
 #include <iostream>
-#include <cstring>
+#include <spdlog/spdlog.h>
+
+unsigned int TextureFromFile(const char* path, const std::string& directory, const aiScene* scene, bool gamma = false);
+glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from);
 
 Model::Model(std::string const& path, bool gamma) : gammaCorrection(gamma) {
     loadModel(path);
 }
 
-void Model::Draw(Shader& shader) {
+void Model::Draw(Shader& shader, const glm::mat4& model) {
     for (unsigned int i = 0; i < meshes.size(); i++)
-        meshes[i].Draw(shader);
+        meshes[i].Draw(shader, model);
 }
 
 void Model::loadModel(std::string const& path) {
@@ -17,22 +20,31 @@ void Model::loadModel(std::string const& path) {
     const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
-        std::cout << "ERROR::ASSIMP::" << importer.GetErrorString() << std::endl;
+        spdlog::error("Error: ASSIMP::{}", importer.GetErrorString());
         return;
     }
+
     directory = path.substr(0, path.find_last_of('/'));
-    processNode(scene->mRootNode, scene);
+    processNode(scene->mRootNode, scene, glm::mat4(1.0f));
+
+    spdlog::info("Model loaded successfully: {}", path);
 }
 
-void Model::processNode(aiNode* node, const aiScene* scene) {
+void Model::processNode(aiNode* node, const aiScene* scene, const glm::mat4& parentTransform) {
+    glm::mat4 nodeTransform = parentTransform * aiMatrix4x4ToGlm(node->mTransformation);
+
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(processMesh(mesh, scene));
+        Mesh processedMesh = processMesh(mesh, scene);
+        processedMesh.transform = nodeTransform;
+        meshes.push_back(processedMesh);
     }
+
     for (unsigned int i = 0; i < node->mNumChildren; i++) {
-        processNode(node->mChildren[i], scene);
+        processNode(node->mChildren[i], scene, nodeTransform);
     }
 }
+
 
 Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     std::vector<Vertex> vertices;
@@ -164,10 +176,10 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, con
 
                     stbi_image_free(data);
                 } else {
-                    std::cout << "Failed to load embedded texture from memory: " << path << std::endl;
+                    spdlog::error("Failed to load embedded texture from memory: {}", path);
                 }
             } else {
-                std::cout << "Uncompressed embedded texture not supported (height > 0)" << std::endl;
+                spdlog::warn("Uncompressed embedded texture not supported (height > 0)");
             }
         }
     } else {
@@ -190,10 +202,19 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, con
 
             stbi_image_free(data);
         } else {
-            std::cout << "Texture failed to load at path: " << filename << std::endl;
+            spdlog::error("Texture failed to load at path: {}", filename);
             stbi_image_free(data);
         }
     }
 
     return textureID;
+}
+
+static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from) {
+    return glm::mat4(
+        from.a1, from.b1, from.c1, from.d1,
+        from.a2, from.b2, from.c2, from.d2,
+        from.a3, from.b3, from.c3, from.d3,
+        from.a4, from.b4, from.c4, from.d4
+    );
 }

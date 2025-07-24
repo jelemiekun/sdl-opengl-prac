@@ -1,7 +1,7 @@
 #include "Mesh.h"
 
 Mesh::Mesh(std::vector<Vertex> verts, std::vector<unsigned int> inds, std::vector<Texture> texs)
-	: vertices(verts), indices(inds), textures(texs) {
+	: vertices(verts), indices(inds), textures(texs), transform(glm::mat4(1.0f)) {
 	setupMesh();
 }
 
@@ -38,7 +38,7 @@ void Mesh::setupMesh() {
 }
 
 
-void Mesh::Draw(Shader& shader) {
+void Mesh::Draw(Shader& shader, const glm::mat4& model) {
 	int diffuseNum = 0;
 	int specularNum = 0;
 	// Binds all the textures to their own texture units and sets the respective uniforms in the fragment shader
@@ -50,9 +50,12 @@ void Mesh::Draw(Shader& shader) {
 			number = std::to_string(++diffuseNum);
 		else if (name == "texture_specular")
 			number = std::to_string(++specularNum);
-		glUniform1i(glGetUniformLocation(shader.ID, ("material." + name + number).c_str()), i);
+		shader.setInt("material." + name + number, i);
 		glBindTexture(GL_TEXTURE_2D, textures[i].id);
 	}
+	
+	shader.setMat4("u_Model", model * transform);
+
 	// Draws the mesh
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
