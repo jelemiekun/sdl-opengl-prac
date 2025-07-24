@@ -209,7 +209,7 @@ void GameWindow::setupDraw() {
     textureObjectSpecular = std::make_unique<Texture2D>("assets/container2_specular.png");
 
     model1 = std::make_unique<Model>("assets/models/military_backpack/scene.gltf");
-    model2 = std::make_unique<Model>("assets/models/donut/Donut.gltf");
+    model2 = std::make_unique<Model>("assets/models/Donut.glb");
 }
 
 
