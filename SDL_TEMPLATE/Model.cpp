@@ -3,8 +3,9 @@
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-unsigned int TextureFromFile(const char* path, const std::string& directory, const aiScene* scene, bool gamma = false);
-glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from);
+static unsigned int TextureFromFile(const char* path, const std::string& directory, const aiScene* scene, bool gamma = false);
+static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from);
+static std::string DecodeURI(const std::string& uri);
 
 Model::Model(std::string const& path, bool gamma) : gammaCorrection(gamma) {
     loadModel(path);
@@ -116,6 +117,7 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial* mat, aiTextureType 
     for (unsigned int i = 0; i < mat->GetTextureCount(type); i++) {
         aiString str;
         mat->GetTexture(type, i, &str);
+        spdlog::info("Texture path: {}", str.C_Str());
 
         bool skip = false;
         for (unsigned int j = 0; j < textures_loaded.size(); j++) {
@@ -142,7 +144,7 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, con
     unsigned int textureID;
     glGenTextures(1, &textureID);
 
-    std::string texturePath(path);
+    std::string texturePath = directory + "/" + DecodeURI(path);
 
     if (texturePath[0] == '*') {
         // Handle embedded texture
@@ -184,7 +186,7 @@ unsigned int TextureFromFile(const char* path, const std::string& directory, con
         }
     } else {
         // External texture file
-        std::string filename = directory + '/' + path;
+        std::string filename = directory + '/' + DecodeURI(path);
         int width, height, nrComponents;
         unsigned char* data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
         if (data) {
@@ -217,4 +219,23 @@ static glm::mat4 aiMatrix4x4ToGlm(const aiMatrix4x4& from) {
         from.a3, from.b3, from.c3, from.d3,
         from.a4, from.b4, from.c4, from.d4
     );
+}
+
+static std::string DecodeURI(const std::string& uri) {
+    std::string result;
+    char a, b;
+    for (size_t i = 0; i < uri.length(); i++) {
+        if (uri[i] == '%' && i + 2 < uri.length() &&
+            std::isxdigit(a = uri[i + 1]) && std::isxdigit(b = uri[i + 2])) {
+            a = std::tolower(a);
+            b = std::tolower(b);
+            a = a >= 'a' ? a - 'a' + 10 : a - '0';
+            b = b >= 'a' ? b - 'a' + 10 : b - '0';
+            result += static_cast<char>(16 * a + b);
+            i += 2;
+        } else {
+            result += uri[i];
+        }
+    }
+    return result;
 }
